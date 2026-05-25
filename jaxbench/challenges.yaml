@@ -1,0 +1,454 @@
+version: 2
+n_challenges: 15
+tiers:
+  jaxlib_kernel: 10
+  xla_core: 5
+challenges:
+- id: linalg_lu_getrf
+  tier: jaxlib_kernel
+  title: LU decomposition (getrf)
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  region: GetrfImpl / EVOLVE-BLOCK
+  why: LU backs jnp.linalg.solve/inv/det and every linear-solve-heavy program.
+  build:
+    target: //jaxlib/cuda:_solver
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 7.0
+    so_path: jax_cuda12_plugin/_solver.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs //jaxlib/cuda:_solver
+  test:
+    workload: lu
+    sizes:
+    - 256
+    - 512
+    - 1024
+    - 2048
+    dtypes:
+    - f32
+    - f64
+    - c64
+    - c128
+    devices:
+    - gpu
+    - cpu
+    - tpu
+    correctness: lu_reconstruct
+- id: linalg_qr_geqrf
+  tier: jaxlib_kernel
+  title: QR decomposition (geqrf/orgqr)
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  region: GeqrfImpl / OrgqrImpl
+  why: QR backs least-squares, orthogonalization, many iterative solvers.
+  build:
+    target: //jaxlib/cuda:_solver
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 7.0
+    so_path: jax_cuda12_plugin/_solver.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs //jaxlib/cuda:_solver
+  test:
+    workload: qr
+    sizes:
+    - 256
+    - 512
+    - 1024
+    - 2048
+    dtypes:
+    - f32
+    - f64
+    - c64
+    - c128
+    devices:
+    - gpu
+    - cpu
+    - tpu
+    correctness: qr_reconstruct
+- id: linalg_svd_gesvd
+  tier: jaxlib_kernel
+  title: SVD (gesvd/gesvdj)
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  region: GesvdImpl
+  why: SVD backs PCA, low-rank, pinv, spectral methods.
+  build:
+    target: //jaxlib/cuda:_solver
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 7.0
+    so_path: jax_cuda12_plugin/_solver.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs //jaxlib/cuda:_solver
+  test:
+    workload: svd
+    sizes:
+    - 256
+    - 512
+    - 1024
+    dtypes:
+    - f32
+    - f64
+    devices:
+    - gpu
+    - cpu
+    - tpu
+    correctness: svd_reconstruct
+- id: linalg_eigh_syevd
+  tier: jaxlib_kernel
+  title: Symmetric/Hermitian eig (syevd/heevd)
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  region: SyevdImpl
+  why: eigh backs spectral methods, PCA, physics; a common bottleneck.
+  build:
+    target: //jaxlib/cuda:_solver
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 7.0
+    so_path: jax_cuda12_plugin/_solver.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs //jaxlib/cuda:_solver
+  test:
+    workload: eigh
+    sizes:
+    - 256
+    - 512
+    - 1024
+    dtypes:
+    - f32
+    - f64
+    - c64
+    - c128
+    devices:
+    - gpu
+    - cpu
+    - tpu
+    correctness: eigh_residual
+- id: linalg_cholesky_update
+  tier: jaxlib_kernel
+  title: Rank-1 Cholesky update (drotg)
+  file: jaxlib/gpu/linalg_kernels.cu.cc
+  region: drotg / CholeskyUpdateKernel (EVOLVE-BLOCK)
+  why: Online/streaming covariance, Kalman filters, GP updates.
+  build:
+    target: //jaxlib/cuda:_linalg
+    flags:
+    - --config=cuda_libraries_from_stubs
+    - --config=build_cuda_with_clang
+    rebuild_s: 12.9
+    so_path: jax_cuda12_plugin/_linalg.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs --config=build_cuda_with_clang
+      //jaxlib/cuda:_linalg
+  test:
+    workload: cholesky_update
+    sizes:
+    - 256
+    - 512
+    - 1024
+    dtypes:
+    - f32
+    - f64
+    devices:
+    - gpu
+    correctness: cholesky_update_residual
+- id: linalg_tridiagonal_solve
+  tier: jaxlib_kernel
+  title: Tridiagonal solve (perturbed pivots)
+  file: jaxlib/tridiagonal_solve_perturbed.h
+  region: MaybePerturbPivot (EVOLVE-BLOCK)
+  why: PDE/ODE solvers, time series, banded systems; proven +41.7% in earlier work.
+  build:
+    target: //jaxlib/cuda:_linalg
+    flags:
+    - --config=cuda_libraries_from_stubs
+    - --config=build_cuda_with_clang
+    rebuild_s: 17.0
+    so_path: jax_cuda12_plugin/_linalg.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs --config=build_cuda_with_clang
+      //jaxlib/cuda:_linalg
+  test:
+    workload: tridiagonal_solve
+    sizes:
+    - 1024
+    - 4096
+    - 16384
+    dtypes:
+    - f32
+    - f64
+    devices:
+    - gpu
+    - cpu
+    correctness: tridiagonal_residual
+- id: linalg_householder
+  tier: jaxlib_kernel
+  title: Householder reflector product
+  file: jaxlib/gpu/householder_kernels.cu.cc
+  region: ProductOf...Reflectors...Kernel
+  why: QR application step; orthogonal transforms.
+  build:
+    target: //jaxlib/cuda:_solver
+    flags:
+    - --config=cuda_libraries_from_stubs
+    - --config=build_cuda_with_clang
+    rebuild_s: 5.5
+    so_path: jax_cuda12_plugin/_solver.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs --config=build_cuda_with_clang
+      //jaxlib/cuda:_solver
+  test:
+    workload: householder_product
+    sizes:
+    - 256
+    - 512
+    - 1024
+    dtypes:
+    - f32
+    - f64
+    - c64
+    - c128
+    devices:
+    - gpu
+    correctness: householder_orthonormal
+- id: prng_threefry
+  tier: jaxlib_kernel
+  title: Threefry2x32 PRNG
+  file: jaxlib/gpu/prng_kernels.cu.cc
+  region: ThreeFry2x32Kernel (EVOLVE-BLOCK)
+  why: "JAX's RNG \u2014 threaded through every program (init, dropout, sampling).\
+    \ Cheapest kernel to rebuild (~4.8s) => ideal first challenge."
+  build:
+    target: //jaxlib/cuda:_prng
+    flags:
+    - --config=cuda_libraries_from_stubs
+    - --config=build_cuda_with_clang
+    rebuild_s: 4.8
+    so_path: jax_cuda12_plugin/_prng.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs --config=build_cuda_with_clang
+      //jaxlib/cuda:_prng
+  test:
+    workload: threefry_uniform
+    sizes:
+    - 262144
+    - 4194304
+    - 16777216
+    dtypes:
+    - f32
+    devices:
+    - gpu
+    correctness: prng_statistical
+- id: sparse_csr_matmul
+  tier: jaxlib_kernel
+  title: "CSR sparse \xD7 dense matmul"
+  file: jaxlib/gpu/sparse_kernels.cc
+  region: CsrMatmul (EVOLVE-BLOCK)
+  why: GNNs, scientific computing, sparse linear algebra.
+  build:
+    target: //jaxlib/cuda:_sparse
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 8.4
+    so_path: jax_cuda12_plugin/_sparse.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs //jaxlib/cuda:_sparse
+  test:
+    workload: csr_matmul
+    sizes:
+    - 1024
+    - 4096
+    - 16384
+    dtypes:
+    - f32
+    - f64
+    devices:
+    - gpu
+    - cpu
+    correctness: csr_vs_dense
+- id: lapack_cpu_backend
+  tier: jaxlib_kernel
+  title: CPU LAPACK backend (lu/qr/svd/eigh)
+  file: jaxlib/cpu/lapack_kernels.cc
+  region: TriMatrixEquationSolver / EVOLVE-BLOCK
+  why: "The CPU backend for all of jnp.linalg; most-maintained kernel upstream. NOTE:\
+    \ 22.7s monolith \u2014 split the hot routine into its own .cc before iterating."
+  build:
+    target: //jaxlib/cpu:_lapack
+    flags: []
+    rebuild_s: 22.7
+    so_path: jaxlib/cpu/_lapack.so
+    xla_override: false
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check //jaxlib/cpu:_lapack
+  test:
+    workload: lu
+    sizes:
+    - 256
+    - 512
+    - 1024
+    dtypes:
+    - f32
+    - f64
+    devices:
+    - cpu
+    correctness: lu_reconstruct
+- id: xla_scan_expander
+  tier: xla_core
+  title: Scan lowering (jax.lax.scan)
+  file: xla/service/scan_expander.cc
+  region: ExpandInstruction / scan->while lowering
+  why: THE 'scan expensive operations' target. jax.lax.scan lowers through this; RNNs,
+    ODE integrators, cumulative ops, associative scans. Optimizing the lowering makes
+    a huge class of programs faster.
+  build:
+    target: //jaxlib/tools:jax_cuda12_plugin_wheel
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 60.0
+    so_path: null
+    xla_override: true
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local
+      //jaxlib/tools:jax_cuda12_plugin_wheel
+  test:
+    workload: scan_cumsum
+    sizes:
+    - 1024
+    - 8192
+    - 65536
+    dtypes:
+    - f32
+    - f64
+    devices:
+    - gpu
+    - cpu
+    - tpu
+    correctness: scan_vs_reference
+- id: xla_while_loop_simplifier
+  tier: xla_core
+  title: While-loop simplification
+  file: xla/service/while_loop_simplifier.cc
+  region: while-loop simplification pass
+  why: jax.lax.while_loop / fori_loop / scan all lower to While; trip-count and invariant-hoisting
+    optimizations speed up every loop-heavy program.
+  build:
+    target: //jaxlib/tools:jax_cuda12_plugin_wheel
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 60.0
+    so_path: null
+    xla_override: true
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local
+      //jaxlib/tools:jax_cuda12_plugin_wheel
+  test:
+    workload: while_loop_iter
+    sizes:
+    - 1000
+    - 10000
+    - 100000
+    dtypes:
+    - f32
+    devices:
+    - gpu
+    - cpu
+    - tpu
+    correctness: while_vs_reference
+- id: xla_algebraic_simplifier
+  tier: xla_core
+  title: Algebraic simplification pass
+  file: xla/hlo/transforms/simplifiers/algebraic_simplifier.cc
+  region: the simplifier rules
+  why: The biggest single optimization pass (428KB). Better/cheaper algebraic rewrites
+    speed up compilation AND the compiled graph for nearly all programs.
+  build:
+    target: //jaxlib/tools:jax_cuda12_plugin_wheel
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 43.0
+    so_path: null
+    xla_override: true
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local
+      //jaxlib/tools:jax_cuda12_plugin_wheel
+  test:
+    workload: algebra_graph
+    sizes:
+    - 512
+    - 1024
+    - 2048
+    dtypes:
+    - f32
+    devices:
+    - gpu
+    - cpu
+    - tpu
+    correctness: graph_vs_reference
+- id: xla_instruction_fusion
+  tier: xla_core
+  title: Instruction fusion
+  file: xla/service/instruction_fusion.cc
+  region: fusion decisions
+  why: "Fusion eliminates memory traffic for elementwise/reduction chains \u2014 the\
+    \ core lever for memory-bound DL graphs (activations, normalizations, softmax)."
+  build:
+    target: //jaxlib/tools:jax_cuda12_plugin_wheel
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 60.0
+    so_path: null
+    xla_override: true
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local
+      //jaxlib/tools:jax_cuda12_plugin_wheel
+  test:
+    workload: elementwise_chain
+    sizes:
+    - 1048576
+    - 4194304
+    - 16777216
+    dtypes:
+    - f32
+    devices:
+    - gpu
+    - tpu
+    correctness: graph_vs_reference
+- id: xla_hlo_instruction
+  tier: xla_core
+  title: Core HLO IR (hlo_instruction)
+  file: xla/hlo/ir/hlo_instruction.cc
+  region: core IR routines
+  why: "The IR every pass touches; micro-optimizations here speed up *compilation*\
+    \ of all programs. Highest fan-out (the .h is 134s/98 libs) \u2014 edit the .cc\
+    \ only."
+  build:
+    target: //jaxlib/tools:jax_cuda12_plugin_wheel
+    flags:
+    - --config=cuda_libraries_from_stubs
+    rebuild_s: 27.0
+    so_path: null
+    xla_override: true
+    command: bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk
+      --features=-layering_check --config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local
+      //jaxlib/tools:jax_cuda12_plugin_wheel
+  test:
+    workload: compile_time_graph
+    sizes:
+    - 256
+    - 512
+    dtypes:
+    - f32
+    devices:
+    - gpu
+    - cpu
+    correctness: graph_vs_reference

@@ -17,6 +17,9 @@ JAX_REPO = os.environ.get("JAXBENCH_JAX_REPO", "/home/oleary/jax")
 BAZEL = os.environ.get("JAXBENCH_BAZEL", "/usr/local/bin/bazel")
 DISK_CACHE = os.environ.get("JAXBENCH_DISK_CACHE", "/data/bazel-disk")
 PY_VER = os.environ.get("HERMETIC_PYTHON_VERSION", "3.12")
+# Local, editable copy of the XLA source for the xla_core tier (in-place edits to the
+# http_archive cache are NOT detected by bazel; --override_repository is required).
+XLA_LOCAL = os.environ.get("JAXBENCH_XLA_LOCAL", "/data/xla-local")
 
 
 @dataclass
@@ -35,15 +38,52 @@ def _bazel_elapsed(text: str):
     return float(m.group(1)) if m else None
 
 
+def ensure_xla_local() -> str:
+    """Copy the bazel-fetched XLA source to an editable location (once)."""
+    import glob
+    if os.path.isdir(XLA_LOCAL):
+        return XLA_LOCAL
+    cand = glob.glob(os.path.expanduser("~/.cache/bazel/**/external/xla", recursive=True)) \
+        or glob.glob("/mnt/bazel/**/external/xla", recursive=True)
+    if not cand:
+        raise FileNotFoundError("fetched external/xla not found; run a jax build first")
+    shutil.copytree(cand[0], XLA_LOCAL, symlinks=True)
+    return XLA_LOCAL
+
+
+def stage_xla_candidate(xla_relpath: str, source: str) -> str:
+    """Write a candidate XLA source into the editable copy; return backup path."""
+    ensure_xla_local()
+    dest = os.path.join(XLA_LOCAL, xla_relpath)
+    backup = dest + ".jaxbench.bak"
+    if not os.path.exists(backup):
+        shutil.copy2(dest, backup)
+    with open(dest, "w") as f:
+        f.write(source)
+    return dest
+
+
+def restore_xla(xla_relpath: str) -> None:
+    dest = os.path.join(XLA_LOCAL, xla_relpath)
+    backup = dest + ".jaxbench.bak"
+    if os.path.exists(backup):
+        shutil.copy2(backup, dest)
+
+
 def build_target(target: str, *, clang_device: bool = True,
-                 libs_from_stubs: bool = True, log_path: str | None = None) -> BuildResult:
-    """Rebuild a single jaxlib extension target. Returns timing + the produced .so path."""
+                 libs_from_stubs: bool = True, xla_override: bool = False,
+                 log_path: str | None = None) -> BuildResult:
+    """Rebuild a target. jaxlib tier -> extension .so. xla_core tier (xla_override)
+    -> the plugin wheel built against the editable XLA copy (reinstall to apply)."""
     cmd = [BAZEL, "build", f"--repo_env=HERMETIC_PYTHON_VERSION={PY_VER}",
            f"--disk_cache={DISK_CACHE}", "--features=-layering_check"]
-    if libs_from_stubs and target.startswith("//jaxlib/cuda"):
+    if libs_from_stubs and ("//jaxlib/cuda" in target or "plugin" in target):
         cmd.append("--config=cuda_libraries_from_stubs")
-    if clang_device and target.startswith("//jaxlib/cuda"):
+    if clang_device and "//jaxlib/cuda" in target:
         cmd.append("--config=build_cuda_with_clang")  # ~25-36% faster device compiles
+    if xla_override:
+        ensure_xla_local()
+        cmd.append(f"--override_repository=xla={XLA_LOCAL}")
     cmd.append(target)
 
     t0 = time.monotonic()
