@@ -1,0 +1,2483 @@
+version: 1
+n_tasks: 100
+tasks:
+- id: threefry_normal__gpu__f32
+  op: threefry_normal
+  family: prng
+  file: jaxlib/gpu/prng_kernels.cu.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_prng
+  build_target: //jaxlib/cuda:_prng
+  so_path: jax_cuda12_plugin/_prng.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 65536
+  - 1048576
+  - 16777216
+  tol: 0.0002
+  ref: threefry_normal
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Normal via Threefry2x32. jax.random.normal.
+- id: threefry_normal__gpu__f64
+  op: threefry_normal
+  family: prng
+  file: jaxlib/gpu/prng_kernels.cu.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_prng
+  build_target: //jaxlib/cuda:_prng
+  so_path: jax_cuda12_plugin/_prng.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 65536
+  - 1048576
+  - 16777216
+  tol: 1.0e-10
+  ref: threefry_normal
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Normal via Threefry2x32. jax.random.normal.
+- id: threefry_uniform__gpu__f32
+  op: threefry_uniform
+  family: prng
+  file: jaxlib/gpu/prng_kernels.cu.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_prng
+  build_target: //jaxlib/cuda:_prng
+  so_path: jax_cuda12_plugin/_prng.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 65536
+  - 1048576
+  - 16777216
+  tol: 0.0002
+  ref: threefry_uniform
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Uniform via Threefry2x32. jax.random.uniform.
+- id: threefry_uniform__gpu__f64
+  op: threefry_uniform
+  family: prng
+  file: jaxlib/gpu/prng_kernels.cu.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_prng
+  build_target: //jaxlib/cuda:_prng
+  so_path: jax_cuda12_plugin/_prng.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 65536
+  - 1048576
+  - 16777216
+  tol: 1.0e-10
+  ref: threefry_uniform
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Uniform via Threefry2x32. jax.random.uniform.
+- id: cholesky__gpu__c128
+  op: cholesky
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: cholesky
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Cholesky (potrf). jnp.linalg.cholesky.
+- id: cholesky__gpu__c64
+  op: cholesky
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: cholesky
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Cholesky (potrf). jnp.linalg.cholesky.
+- id: cholesky__gpu__f32
+  op: cholesky
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: cholesky
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Cholesky (potrf). jnp.linalg.cholesky.
+- id: cholesky__gpu__f64
+  op: cholesky
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: cholesky
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Cholesky (potrf). jnp.linalg.cholesky.
+- id: det__gpu__c128
+  op: det
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: det
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Determinant via LU. jnp.linalg.det.
+- id: det__gpu__c64
+  op: det
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: det
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Determinant via LU. jnp.linalg.det.
+- id: det__gpu__f32
+  op: det
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: det
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Determinant via LU. jnp.linalg.det.
+- id: det__gpu__f64
+  op: det
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: det
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Determinant via LU. jnp.linalg.det.
+- id: eigh__gpu__c128
+  op: eigh
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: eigh
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Symmetric/Hermitian eig (syevd/heevd). jnp.linalg.eigh.
+- id: eigh__gpu__c64
+  op: eigh
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: eigh
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Symmetric/Hermitian eig (syevd/heevd). jnp.linalg.eigh.
+- id: eigh__gpu__f32
+  op: eigh
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: eigh
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Symmetric/Hermitian eig (syevd/heevd). jnp.linalg.eigh.
+- id: eigh__gpu__f64
+  op: eigh
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: eigh
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Symmetric/Hermitian eig (syevd/heevd). jnp.linalg.eigh.
+- id: expm__gpu__f32
+  op: expm
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: expm
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Matrix exponential (Pade/eig). jax.scipy.linalg.expm.
+- id: expm__gpu__f64
+  op: expm
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: expm
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Matrix exponential (Pade/eig). jax.scipy.linalg.expm.
+- id: householder_product__gpu__c128
+  op: householder_product
+  family: linalg
+  file: jaxlib/gpu/householder_kernels.cu.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: householder_product
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Apply elementary Householder reflectors. jax.lax.linalg.householder_product.
+- id: householder_product__gpu__c64
+  op: householder_product
+  family: linalg
+  file: jaxlib/gpu/householder_kernels.cu.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: householder_product
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Apply elementary Householder reflectors. jax.lax.linalg.householder_product.
+- id: householder_product__gpu__f32
+  op: householder_product
+  family: linalg
+  file: jaxlib/gpu/householder_kernels.cu.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: householder_product
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Apply elementary Householder reflectors. jax.lax.linalg.householder_product.
+- id: householder_product__gpu__f64
+  op: householder_product
+  family: linalg
+  file: jaxlib/gpu/householder_kernels.cu.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: householder_product
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Apply elementary Householder reflectors. jax.lax.linalg.householder_product.
+- id: inv__gpu__c128
+  op: inv
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: inv
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Matrix inverse. jnp.linalg.inv.
+- id: inv__gpu__c64
+  op: inv
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: inv
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Matrix inverse. jnp.linalg.inv.
+- id: inv__gpu__f32
+  op: inv
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: inv
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Matrix inverse. jnp.linalg.inv.
+- id: inv__gpu__f64
+  op: inv
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: inv
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Matrix inverse. jnp.linalg.inv.
+- id: lstsq__gpu__f32
+  op: lstsq
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lstsq
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Least squares (gelsd/QR). jnp.linalg.lstsq.
+- id: lstsq__gpu__f64
+  op: lstsq
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lstsq
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Least squares (gelsd/QR). jnp.linalg.lstsq.
+- id: lu__gpu__c128
+  op: lu
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lu
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: LU (getrf). jax.scipy.linalg.lu; backend cuSOLVER / LAPACK.
+- id: lu__gpu__c64
+  op: lu
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lu
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: LU (getrf). jax.scipy.linalg.lu; backend cuSOLVER / LAPACK.
+- id: lu__gpu__f32
+  op: lu
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lu
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: LU (getrf). jax.scipy.linalg.lu; backend cuSOLVER / LAPACK.
+- id: lu__gpu__f64
+  op: lu
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lu
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: LU (getrf). jax.scipy.linalg.lu; backend cuSOLVER / LAPACK.
+- id: lu_solve__gpu__c128
+  op: lu_solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lu_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Solve with precomputed LU (getrs). jax.scipy.linalg.lu_solve.
+- id: lu_solve__gpu__c64
+  op: lu_solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lu_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Solve with precomputed LU (getrs). jax.scipy.linalg.lu_solve.
+- id: lu_solve__gpu__f32
+  op: lu_solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lu_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Solve with precomputed LU (getrs). jax.scipy.linalg.lu_solve.
+- id: lu_solve__gpu__f64
+  op: lu_solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lu_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Solve with precomputed LU (getrs). jax.scipy.linalg.lu_solve.
+- id: qr__gpu__c128
+  op: qr
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: qr
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: QR (geqrf+orgqr). jnp.linalg.qr.
+- id: qr__gpu__c64
+  op: qr
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: qr
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: QR (geqrf+orgqr). jnp.linalg.qr.
+- id: qr__gpu__f32
+  op: qr
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: qr
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: QR (geqrf+orgqr). jnp.linalg.qr.
+- id: qr__gpu__f64
+  op: qr
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: qr
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: QR (geqrf+orgqr). jnp.linalg.qr.
+- id: slogdet__gpu__f32
+  op: slogdet
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: slogdet
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Sign+log|det| via LU. jnp.linalg.slogdet.
+- id: slogdet__gpu__f64
+  op: slogdet
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: slogdet
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Sign+log|det| via LU. jnp.linalg.slogdet.
+- id: solve__gpu__c128
+  op: solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Linear solve (getrf+getrs). jnp.linalg.solve.
+- id: solve__gpu__c64
+  op: solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Linear solve (getrf+getrs). jnp.linalg.solve.
+- id: solve__gpu__f32
+  op: solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Linear solve (getrf+getrs). jnp.linalg.solve.
+- id: solve__gpu__f64
+  op: solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Linear solve (getrf+getrs). jnp.linalg.solve.
+- id: svd__gpu__c128
+  op: svd
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c128
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: svd
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: SVD (gesvd/gesvdj). jnp.linalg.svd.
+- id: svd__gpu__c64
+  op: svd
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: c64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: svd
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: SVD (gesvd/gesvdj). jnp.linalg.svd.
+- id: svd__gpu__f32
+  op: svd
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: svd
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: SVD (gesvd/gesvdj). jnp.linalg.svd.
+- id: svd__gpu__f64
+  op: svd
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_solver
+  build_target: //jaxlib/cuda:_solver
+  so_path: jax_cuda12_plugin/_solver.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: svd
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: SVD (gesvd/gesvdj). jnp.linalg.svd.
+- id: qr_pivoting__gpu__f32
+  op: qr_pivoting
+  family: linalg
+  file: jaxlib/gpu/hybrid_kernels.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_hybrid
+  build_target: //jaxlib/cuda:_hybrid
+  so_path: jax_cuda12_plugin/_hybrid.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: qr_pivoting
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Column-pivoted QR. jax.scipy.linalg.qr(pivoting=True).
+- id: qr_pivoting__gpu__f64
+  op: qr_pivoting
+  family: linalg
+  file: jaxlib/gpu/hybrid_kernels.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_hybrid
+  build_target: //jaxlib/cuda:_hybrid
+  so_path: jax_cuda12_plugin/_hybrid.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: qr_pivoting
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Column-pivoted QR. jax.scipy.linalg.qr(pivoting=True).
+- id: csr_matmul__cpu__f32
+  op: csr_matmul
+  family: sparse
+  file: jaxlib/gpu/sparse_kernels.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_sparse
+  build_target: //jaxlib/cpu:_sparse
+  so_path: jaxlib/cpu/_sparse.so
+  wheel: jaxlib
+  sizes:
+  - 1024
+  - 4096
+  - 16384
+  tol: 0.0002
+  ref: csr_matmul
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: CSR @ dense. jax.experimental.sparse.
+- id: csr_matmul__cpu__f64
+  op: csr_matmul
+  family: sparse
+  file: jaxlib/gpu/sparse_kernels.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_sparse
+  build_target: //jaxlib/cpu:_sparse
+  so_path: jaxlib/cpu/_sparse.so
+  wheel: jaxlib
+  sizes:
+  - 1024
+  - 4096
+  - 16384
+  tol: 1.0e-10
+  ref: csr_matmul
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: CSR @ dense. jax.experimental.sparse.
+- id: csr_matmul__gpu__f32
+  op: csr_matmul
+  family: sparse
+  file: jaxlib/gpu/sparse_kernels.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_sparse
+  build_target: //jaxlib/cuda:_sparse
+  so_path: jax_cuda12_plugin/_sparse.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 1024
+  - 4096
+  - 16384
+  tol: 0.0002
+  ref: csr_matmul
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: CSR @ dense. jax.experimental.sparse.
+- id: csr_matmul__gpu__f64
+  op: csr_matmul
+  family: sparse
+  file: jaxlib/gpu/sparse_kernels.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_sparse
+  build_target: //jaxlib/cuda:_sparse
+  so_path: jax_cuda12_plugin/_sparse.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 1024
+  - 4096
+  - 16384
+  tol: 1.0e-10
+  ref: csr_matmul
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: CSR @ dense. jax.experimental.sparse.
+- id: cholesky_update__gpu__f32
+  op: cholesky_update
+  family: linalg
+  file: jaxlib/gpu/linalg_kernels.cu.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_linalg
+  build_target: //jaxlib/cuda:_linalg
+  so_path: jax_cuda12_plugin/_linalg.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: cholesky_update
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Rank-1 Cholesky update (drotg). jax.lax.linalg.cholesky_update.
+- id: cholesky_update__gpu__f64
+  op: cholesky_update
+  family: linalg
+  file: jaxlib/gpu/linalg_kernels.cu.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_linalg
+  build_target: //jaxlib/cuda:_linalg
+  so_path: jax_cuda12_plugin/_linalg.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: cholesky_update
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Rank-1 Cholesky update (drotg). jax.lax.linalg.cholesky_update.
+- id: lu_pivots_to_permutation__gpu__i32
+  op: lu_pivots_to_permutation
+  family: linalg
+  file: jaxlib/gpu/linalg_kernels.cu.cc
+  device: gpu
+  dtype: i32
+  backend: gpu_linalg
+  build_target: //jaxlib/cuda:_linalg
+  so_path: jax_cuda12_plugin/_linalg.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0001
+  ref: lu_pivots_to_permutation
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Pivots->permutation. jax.lax.linalg.lu_pivots_to_permutation.
+- id: tridiagonal_solve__gpu__f32
+  op: tridiagonal_solve
+  family: tridiagonal
+  file: jaxlib/gpu/linalg_kernels.cu.cc
+  device: gpu
+  dtype: f32
+  backend: gpu_linalg
+  build_target: //jaxlib/cuda:_linalg
+  so_path: jax_cuda12_plugin/_linalg.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 256
+  - 1024
+  - 4096
+  - 16384
+  tol: 0.0002
+  ref: tridiagonal_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: jax.lax.linalg.tridiagonal_solve.
+- id: tridiagonal_solve__gpu__f64
+  op: tridiagonal_solve
+  family: tridiagonal
+  file: jaxlib/gpu/linalg_kernels.cu.cc
+  device: gpu
+  dtype: f64
+  backend: gpu_linalg
+  build_target: //jaxlib/cuda:_linalg
+  so_path: jax_cuda12_plugin/_linalg.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 256
+  - 1024
+  - 4096
+  - 16384
+  tol: 1.0e-10
+  ref: tridiagonal_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: jax.lax.linalg.tridiagonal_solve.
+- id: tridiagonal_solve_perturbed__gpu__f32
+  op: tridiagonal_solve_perturbed
+  family: tridiagonal
+  file: jaxlib/tridiagonal_solve_perturbed.h
+  device: gpu
+  dtype: f32
+  backend: gpu_linalg
+  build_target: //jaxlib/cuda:_linalg
+  so_path: jax_cuda12_plugin/_linalg.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 256
+  - 1024
+  - 4096
+  - 16384
+  tol: 0.0002
+  ref: tridiagonal_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Perturbed-pivot tridiagonal solve (header; fans out, gen-68 +41.73%).
+- id: tridiagonal_solve_perturbed__gpu__f64
+  op: tridiagonal_solve_perturbed
+  family: tridiagonal
+  file: jaxlib/tridiagonal_solve_perturbed.h
+  device: gpu
+  dtype: f64
+  backend: gpu_linalg
+  build_target: //jaxlib/cuda:_linalg
+  so_path: jax_cuda12_plugin/_linalg.so
+  wheel: jax-cuda-plugin
+  sizes:
+  - 256
+  - 1024
+  - 4096
+  - 16384
+  tol: 1.0e-10
+  ref: tridiagonal_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Perturbed-pivot tridiagonal solve (header; fans out, gen-68 +41.73%).
+- id: cholesky__cpu__c128
+  op: cholesky
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c128
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: cholesky
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Cholesky (potrf). jnp.linalg.cholesky.
+- id: cholesky__cpu__c64
+  op: cholesky
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: cholesky
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Cholesky (potrf). jnp.linalg.cholesky.
+- id: cholesky__cpu__f32
+  op: cholesky
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: cholesky
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Cholesky (potrf). jnp.linalg.cholesky.
+- id: cholesky__cpu__f64
+  op: cholesky
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: cholesky
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Cholesky (potrf). jnp.linalg.cholesky.
+- id: det__cpu__c128
+  op: det
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c128
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: det
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Determinant via LU. jnp.linalg.det.
+- id: det__cpu__c64
+  op: det
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: det
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Determinant via LU. jnp.linalg.det.
+- id: det__cpu__f32
+  op: det
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: det
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Determinant via LU. jnp.linalg.det.
+- id: det__cpu__f64
+  op: det
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: det
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Determinant via LU. jnp.linalg.det.
+- id: eigh__cpu__c128
+  op: eigh
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c128
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: eigh
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Symmetric/Hermitian eig (syevd/heevd). jnp.linalg.eigh.
+- id: eigh__cpu__c64
+  op: eigh
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: eigh
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Symmetric/Hermitian eig (syevd/heevd). jnp.linalg.eigh.
+- id: eigh__cpu__f32
+  op: eigh
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: eigh
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Symmetric/Hermitian eig (syevd/heevd). jnp.linalg.eigh.
+- id: eigh__cpu__f64
+  op: eigh
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: eigh
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Symmetric/Hermitian eig (syevd/heevd). jnp.linalg.eigh.
+- id: expm__cpu__f32
+  op: expm
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: expm
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Matrix exponential (Pade/eig). jax.scipy.linalg.expm.
+- id: expm__cpu__f64
+  op: expm
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: expm
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Matrix exponential (Pade/eig). jax.scipy.linalg.expm.
+- id: inv__cpu__c128
+  op: inv
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c128
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: inv
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Matrix inverse. jnp.linalg.inv.
+- id: inv__cpu__c64
+  op: inv
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: inv
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Matrix inverse. jnp.linalg.inv.
+- id: inv__cpu__f32
+  op: inv
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: inv
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Matrix inverse. jnp.linalg.inv.
+- id: inv__cpu__f64
+  op: inv
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: inv
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Matrix inverse. jnp.linalg.inv.
+- id: lstsq__cpu__f32
+  op: lstsq
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lstsq
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Least squares (gelsd/QR). jnp.linalg.lstsq.
+- id: lstsq__cpu__f64
+  op: lstsq
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lstsq
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Least squares (gelsd/QR). jnp.linalg.lstsq.
+- id: lu__cpu__c128
+  op: lu
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c128
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lu
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: LU (getrf). jax.scipy.linalg.lu; backend cuSOLVER / LAPACK.
+- id: lu__cpu__c64
+  op: lu
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lu
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: LU (getrf). jax.scipy.linalg.lu; backend cuSOLVER / LAPACK.
+- id: lu__cpu__f32
+  op: lu
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lu
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: LU (getrf). jax.scipy.linalg.lu; backend cuSOLVER / LAPACK.
+- id: lu__cpu__f64
+  op: lu
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lu
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: LU (getrf). jax.scipy.linalg.lu; backend cuSOLVER / LAPACK.
+- id: lu_solve__cpu__c128
+  op: lu_solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c128
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lu_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Solve with precomputed LU (getrs). jax.scipy.linalg.lu_solve.
+- id: lu_solve__cpu__c64
+  op: lu_solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lu_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Solve with precomputed LU (getrs). jax.scipy.linalg.lu_solve.
+- id: lu_solve__cpu__f32
+  op: lu_solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: lu_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Solve with precomputed LU (getrs). jax.scipy.linalg.lu_solve.
+- id: lu_solve__cpu__f64
+  op: lu_solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: lu_solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Solve with precomputed LU (getrs). jax.scipy.linalg.lu_solve.
+- id: qr__cpu__c128
+  op: qr
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c128
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: qr
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: QR (geqrf+orgqr). jnp.linalg.qr.
+- id: qr__cpu__c64
+  op: qr
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: qr
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: QR (geqrf+orgqr). jnp.linalg.qr.
+- id: qr__cpu__f32
+  op: qr
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: qr
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: QR (geqrf+orgqr). jnp.linalg.qr.
+- id: qr__cpu__f64
+  op: qr
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: qr
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: QR (geqrf+orgqr). jnp.linalg.qr.
+- id: slogdet__cpu__f32
+  op: slogdet
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: slogdet
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Sign+log|det| via LU. jnp.linalg.slogdet.
+- id: slogdet__cpu__f64
+  op: slogdet
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: slogdet
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: false
+  note: Sign+log|det| via LU. jnp.linalg.slogdet.
+- id: solve__cpu__c128
+  op: solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c128
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 1.0e-10
+  ref: solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Linear solve (getrf+getrs). jnp.linalg.solve.
+- id: solve__cpu__c64
+  op: solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: c64
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Linear solve (getrf+getrs). jnp.linalg.solve.
+- id: solve__cpu__f32
+  op: solve
+  family: linalg
+  file: jaxlib/gpu/solver_kernels_ffi.cc
+  device: cpu
+  dtype: f32
+  backend: cpu_lapack
+  build_target: //jaxlib/cpu:_lapack
+  so_path: jaxlib/cpu/_lapack.so
+  wheel: jaxlib
+  sizes:
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+  tol: 0.0002
+  ref: solve
+  metrics:
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_baseline
+  - correctness_pass
+  shardable: true
+  note: Linear solve (getrf+getrs). jnp.linalg.solve.

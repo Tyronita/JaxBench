@@ -1,0 +1,39 @@
+# ShinkaEvolve island configuration for JaxBench.
+# One island per mutation-surface file. `eval_cmd` is what Shinka runs to score a
+# candidate; the loop is build -> hot-swap -> correctness gate -> speedup.
+# Islands are ordered by rebuild cost (cheapest = fastest evolutionary loop first).
+
+defaults:
+  evaluator: shinka/evaluate.py
+  baseline: shinka/baseline.json
+  mutation_region: "EVOLVE-BLOCK"        # only mutate between START/END markers
+  correctness_gate: true                 # fitness 0 if any task fails
+  objective: maximize_mean_speedup
+  generations: 50
+  population: 16
+  budget_per_island: 500
+
+islands:
+  - id: 1
+    file: jaxlib/gpu/prng_kernels.cu.cc      # ~4.8s rebuild, hottest path
+    eval_cmd: "python shinka/evaluate.py --file jaxlib/gpu/prng_kernels.cu.cc"
+    tasks: [threefry_uniform__gpu__f32, threefry_uniform__gpu__f64,
+            threefry_normal__gpu__f32, threefry_normal__gpu__f64]
+  - id: 2
+    file: jaxlib/gpu/linalg_kernels.cc       # ~4.2s rebuild
+    eval_cmd: "python shinka/evaluate.py --file jaxlib/gpu/linalg_kernels.cc"
+  - id: 3
+    file: jaxlib/gpu/solver_kernels_ffi.cc   # ~7s rebuild, most-maintained GPU file
+    eval_cmd: "python shinka/evaluate.py --file jaxlib/gpu/solver_kernels_ffi.cc"
+  - id: 4
+    file: jaxlib/gpu/householder_kernels.cu.cc # ~5.5s rebuild
+    eval_cmd: "python shinka/evaluate.py --file jaxlib/gpu/householder_kernels.cu.cc"
+  - id: 5
+    file: jaxlib/gpu/linalg_kernels.cu.cc    # ~12.9s rebuild (heavy device TU)
+    eval_cmd: "python shinka/evaluate.py --file jaxlib/gpu/linalg_kernels.cu.cc"
+  - id: 6
+    file: jaxlib/tridiagonal_solve_perturbed.h # proven +41.7%; header fan-out (refactor first)
+    eval_cmd: "python shinka/evaluate.py --file jaxlib/tridiagonal_solve_perturbed.h"
+  - id: 7
+    file: jaxlib/cpu/lapack_kernels.cc       # 22.7s rebuild; split before evolving
+    eval_cmd: "python shinka/evaluate.py --file jaxlib/cpu/lapack_kernels.cc"

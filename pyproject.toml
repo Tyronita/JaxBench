@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jaxbench"
+version = "0.1.0"
+description = "A KernelBench-style benchmark for evolving JAX/jaxlib kernels (correctness gate + speedup score, fast targeted rebuilds)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "JaxBench contributors" }]
+keywords = ["jax", "jaxlib", "kernels", "benchmark", "cuda", "shinkaevolve", "kernelbench"]
+dependencies = ["numpy>=1.24", "scipy>=1.10", "pyyaml>=6.0"]
+
+[project.optional-dependencies]
+# JAX itself is environment-specific (CPU vs CUDA plugin); install separately.
+run = ["jax>=0.4"]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+jaxbench = "jaxbench.runner:main"
+
+[tool.setuptools]
+packages = ["jaxbench"]
+
+[tool.setuptools.package-data]
+jaxbench = ["tasks.yaml"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
