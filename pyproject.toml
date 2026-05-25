@@ -14,9 +14,14 @@ keywords = ["jax", "jaxlib", "kernels", "benchmark", "cuda", "shinkaevolve", "ke
 dependencies = ["numpy>=1.24", "scipy>=1.10", "pyyaml>=6.0"]
 
 [project.optional-dependencies]
-# JAX itself is environment-specific (CPU vs CUDA plugin); install separately.
+# JAX itself is environment-specific (CPU vs CUDA plugin vs TPU); install per device.
 run = ["jax>=0.4"]
+cpu = ["jax[cpu]>=0.4"]
+cuda = ["jax[cuda12]>=0.4"]
+tpu = ["jax[tpu]>=0.4"]
 dev = ["pytest>=7.0"]
+# ShinkaEvolve is a real, pinned dependency (the evolutionary driver).
+evolve = ["shinka-evolve @ git+https://github.com/SakanaAI/ShinkaEvolve.git@main"]
 
 [project.scripts]
 jaxbench = "jaxbench.runner:main"

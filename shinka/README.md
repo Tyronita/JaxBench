@@ -1,49 +1,68 @@
 # Driving JaxBench with ShinkaEvolve
 
-ShinkaEvolve is the outer loop; JaxBench is the evaluator. Each island is one jaxlib
-mutation-surface file. The loop per candidate:
+ShinkaEvolve is a **real dependency** here (`pip install -e ".[evolve]"` pulls
+`shinka-evolve` from GitHub). It is the outer evolutionary loop; JaxBench is the
+evaluator.
 
 ```
-ShinkaEvolve mutates code inside // EVOLVE-BLOCK-START/END
+ShinkaEvolve mutates code inside // EVOLVE-BLOCK-START/END   (LLM-guided)
+        │   writes candidate kernel -> program_path
+        ▼
+shinka/evaluate.py --program_path <candidate> --results_dir <dir>
+        │  stage candidate into the jax checkout
+        │  build the one affected extension .so   (clang device, ~5–13s)
+        │  hot-swap the .so into the venv
+        │  correctness gate ── fail ─▶ combined_score = 0.0
+        │  latency sweep → mean speedup vs baseline
+        ▼
+results_dir/metrics.json {combined_score, ...} + correct.json {correct, error}
         │
-        ▼
-shinka/evaluate.py --file <that file>
-        │  build the one affected extension .so   (clang device compiler, ~5–13s)
-        │  hot-swap the .so into the venv          (no wheel repackage)
-        │  correctness gate  ── fail ─▶ fitness = 0.0
-        │  latency sweep → speedup vs baseline
-        ▼
-fitness (mean speedup) on stdout  ── ShinkaEvolve maximises this
+        ▼  ShinkaEvolve maximises combined_score
 ```
 
-## 1. Record the baseline (once, on the unmutated tree)
+This matches ShinkaEvolve's eval contract exactly (`--program_path` / `--results_dir`,
+`metrics.json` with `combined_score`, `correct.json`).
+
+## Run it
 
 ```bash
-python shinka/make_baseline.py            # writes shinka/baseline.json
+pip install -e ".[evolve]"               # installs shinka-evolve (+ jaxbench)
+export ANTHROPIC_API_KEY=...             # or OPENAI_API_KEY — ShinkaEvolve's LLM
+python shinka/make_baseline.py --device gpu     # 1) record baselines once
+python shinka/run_evo.py \                       # 2) evolve one island
+    --file jaxlib/gpu/prng_kernels.cu.cc --generations 20
 ```
 
-## 2. Point ShinkaEvolve at the islands
+`run_evo.py` builds a ShinkaEvolve `EvolutionConfig` + `ShinkaEvolveRunner` with
+`init_program_path` = the live kernel file and `eval_program_path` = `evaluate.py`,
+sets `SHINKA_TARGET_FILE` so the evaluator knows which kernel/tasks to score, and
+calls `runner.run()`.
 
-`shinka_config.yaml` defines one island per file, ordered by rebuild cost so the
-cheapest-to-iterate, highest-value kernels (`prng`, `linalg`, `solver`) evolve first.
-Each island's `eval_cmd` is the JaxBench evaluator.
+## Islands
 
-## 3. Fitness contract
+`shinka_config.yaml` lists one island per mutation-surface file, ordered
+cheapest-rebuild-first so the highest-value, fastest-to-iterate kernels evolve first:
 
-- **Correctness is a hard gate**: if *any* task for the file fails its residual
-  tolerance, fitness is `0.0` (a fast-but-wrong kernel cannot win).
-- Otherwise fitness = **mean speedup** across that file's tasks, over the full
-  (N × dtype) sweep, vs the recorded baseline.
+| order | file | rebuild | why |
+|--:|---|--:|---|
+| 1 | `gpu/prng_kernels.cu.cc` | ~4.8 s | hottest path, cheapest loop |
+| 2 | `gpu/linalg_kernels.cc` | ~4.2 s | host glue |
+| 3 | `gpu/solver_kernels_ffi.cc` | ~7 s | cuSOLVER LU/QR/eigh, most-maintained |
+| 4 | `gpu/householder_kernels.cu.cc` | ~5.5 s | QR building block |
+| 5 | `gpu/linalg_kernels.cu.cc` | ~12.9 s | heavy device TU |
+| 6 | `tridiagonal_solve_perturbed.h` | 6.6–17 s | proven +41.7% (refactor header first) |
+| 7 | `cpu/lapack_kernels.cc` | 22.7 s | split before evolving |
 
-## 4. Why this is fast
+## Fitness contract
 
-The evaluator never rebuilds the wheel. It rebuilds only the affected extension
-`.so` with clang as the CUDA device compiler and hot-swaps it — the recipe measured
-at ~13s for a device kernel vs ~21s for a full nvcc wheel build. See
-[`../docs/METHODOLOGY.md`](../docs/METHODOLOGY.md).
+- **Correctness is a hard gate**: any task for the file failing its residual ⇒
+  `combined_score = 0.0`.
+- Otherwise `combined_score` = **mean speedup** across the file's tasks over the full
+  N-sweep vs the recorded baseline.
 
-## 5. Mutation hygiene
+## Why it's fast
 
-ShinkaEvolve only edits between `// EVOLVE-BLOCK-START` and `// EVOLVE-BLOCK-END`.
-Keep the surface in small leaf `.cc`/`.cu.cc` files; avoid shared headers (they fan
-out across extensions and wheels). See the build/cost notes in the methodology doc.
+The evaluator never rebuilds the wheel — it rebuilds only the affected extension `.so`
+with clang as the CUDA device compiler and hot-swaps it. See
+[`../docs/METHODOLOGY.md`](../docs/METHODOLOGY.md). For scale, run each candidate as a
+serverless invocation — [`../serverless/README.md`](../serverless/README.md).

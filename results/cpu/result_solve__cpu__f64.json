@@ -1,0 +1,69 @@
+{
+  "task": "solve__cpu__f64",
+  "op": "solve",
+  "file": "jaxlib/gpu/solver_kernels_ffi.cc",
+  "device": "cpu",
+  "dtype": "f64",
+  "build_target": "//jaxlib/cpu:_lapack",
+  "ts": 1779728846.4676301,
+  "correctness": {
+    "passed": true,
+    "worst_residual": 5.80889680269642e-16,
+    "tol": 1e-10,
+    "per_size": {
+      "64": 1.9211438498161252e-16,
+      "128": 3.3151597193846026e-16,
+      "256": 2.684119426037477e-16,
+      "512": 5.020847872745834e-16,
+      "1024": 5.80889680269642e-16
+    }
+  },
+  "perf": [
+    {
+      "op": "solve",
+      "device": "cpu",
+      "dtype": "f64",
+      "n": 64,
+      "latency_ms": 0.07218000246211886,
+      "gflops": 2.534700199860536,
+      "trials": 20
+    },
+    {
+      "op": "solve",
+      "device": "cpu",
+      "dtype": "f64",
+      "n": 128,
+      "latency_ms": 0.18262749654240906,
+      "gflops": 7.834906355413256,
+      "trials": 20
+    },
+    {
+      "op": "solve",
+      "device": "cpu",
+      "dtype": "f64",
+      "n": 256,
+      "latency_ms": 0.7004690123721957,
+      "gflops": 16.154722716918627,
+      "trials": 20
+    },
+    {
+      "op": "solve",
+      "device": "cpu",
+      "dtype": "f64",
+      "n": 512,
+      "latency_ms": 469.7011050011497,
+      "gflops": 0.19161712070724854,
+      "trials": 20
+    },
+    {
+      "op": "solve",
+      "device": "cpu",
+      "dtype": "f64",
+      "n": 1024,
+      "latency_ms": 918.7388429709245,
+      "gflops": 0.7814244931074357,
+      "trials": 20
+    }
+  ],
+  "score": 1.0
+}
