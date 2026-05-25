@@ -26,27 +26,39 @@ backends, and a kernel win should be checked on each.
 
 | device | how it's run | status in this repo |
 |---|---|---|
-| **A100 GPU** (`sm_80`) | this repo's tuning box; targeted clang build + `.so` hot-swap | recipe validated; baselines via `make_baseline.py --device gpu` |
-| **CPU** (24-core) | `jax[cpu]`, runs anywhere | **real results recorded** in `results/` (see below) |
+| **A100 GPU** (`sm_80`) | A100 80GB + `jax[cuda12]`; targeted clang build + `.so` hot-swap | **real results recorded** (`results/gpu/`) |
+| **CPU** (24-core) | `jax[cpu]`, runs anywhere | **real results recorded** (`results/cpu/`) |
 | **TPU** | GCP TPU VM / Cloud Run (TPUs are Google-Cloud-only) | device class + tasks + commands wired; run via `infra/gcp_tpu_vm.sh` |
 
-> Honesty note: CPU numbers below are measured on the 24-core host; the A100 recipe is
-> validated and baselines are produced by the included tooling; **TPU runs on GCP**
-> (Azure has no TPUs) and no TPU numbers are claimed until that run is executed. See
-> `infra/README.md`.
+> Honesty note: GPU and CPU numbers below are **measured** (A100 80GB and the 24-core
+> host). **TPU runs on GCP** — Azure has no TPUs — so the TPU device class is fully
+> wired and one command away, but no TPU numbers are claimed until that run is
+> executed. See `infra/README.md`.
+
+### Real A100 80GB results (`f32`, latency ms, all correctness-gated ✅ 9/9)
+
+| task | N=64 | N=256 | N=1024 |
+|---|--:|--:|--:|
+| `cholesky__gpu__f32` | 0.378 | 0.812 | 0.908 |
+| `lu__gpu__f32` | 0.856 | 0.971 | 4.600 |
+| `solve__gpu__f32` | 0.841 | 1.238 | 4.934 |
+| `qr__gpu__f32` | 0.747 | 1.936 | 9.536 |
+| `cholesky_update__gpu__f32` | 1.296 | 2.326 | 11.141 |
+| `eigh__gpu__f32` | 1.683 | 4.138 | 18.911 |
+| `svd__gpu__f32` | 8.072 | 19.809 | 126.280 |
 
 ### Real CPU results (24-core x86_64, `f64`, latency ms)
 
-| task | correct | N=64 | N=256 | N=1024 |
-|---|:--:|--:|--:|--:|
-| `lu__cpu__f64` | ✅ | 0.077 | 0.826 | 924.40 |
-| `qr__cpu__f64` | ✅ | 0.179 | 307.48 | 2337.21 |
-| `svd__cpu__f64` | ✅ | 43.01 | 450.46 | 5204.47 |
-| `cholesky__cpu__f64` | ✅ | 0.038 | 0.551 | 11.34 |
-| `solve__cpu__f64` | ✅ | 0.072 | 0.700 | 918.74 |
-| `tridiagonal_solve__cpu__f64` | ✅ | 0.000 | 0.016 | 0.05 |
+| task | N=64 | N=256 | N=1024 |
+|---|--:|--:|--:|
+| `lu__cpu__f64` | 0.077 | 0.826 | 924.40 |
+| `qr__cpu__f64` | 0.179 | 307.48 | 2337.21 |
+| `svd__cpu__f64` | 43.01 | 450.46 | 5204.47 |
+| `cholesky__cpu__f64` | 0.038 | 0.551 | 11.34 |
+| `solve__cpu__f64` | 0.072 | 0.700 | 918.74 |
+| `tridiagonal_solve__cpu__f64` | 0.000 | 0.016 | 0.05 |
 
-Reproduce: `JAX_ENABLE_X64=1 python -m jaxbench.runner lu__cpu__f64`.
+Reproduce: `JAX_ENABLE_X64=1 python -m jaxbench.runner lu__cpu__f64` (or any task id).
 
 ## Anatomy of a task — what each part represents
 

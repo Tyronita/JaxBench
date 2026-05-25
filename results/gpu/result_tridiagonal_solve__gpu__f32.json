@@ -1,0 +1,59 @@
+{
+  "task": "tridiagonal_solve__gpu__f32",
+  "op": "tridiagonal_solve",
+  "file": "jaxlib/gpu/linalg_kernels.cu.cc",
+  "device": "gpu",
+  "dtype": "f32",
+  "build_target": "//jaxlib/cuda:_linalg",
+  "ts": 1779729156.848235,
+  "correctness": {
+    "passed": true,
+    "worst_residual": 8.010032388483523e-07,
+    "tol": 0.002,
+    "per_size": {
+      "256": 8.010032388483523e-07,
+      "1024": 8.63685443164286e-08,
+      "4096": 9.054227945171078e-08,
+      "16384": 8.738176404676778e-08
+    }
+  },
+  "perf": [
+    {
+      "op": "tridiagonal_solve",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 256,
+      "latency_ms": 0.692749978043139,
+      "gflops": 0.0029563335473284805,
+      "trials": 20
+    },
+    {
+      "op": "tridiagonal_solve",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 1024,
+      "latency_ms": 3.2091159955598414,
+      "gflops": 0.0025527279198802773,
+      "trials": 20
+    },
+    {
+      "op": "tridiagonal_solve",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 4096,
+      "latency_ms": 0.7872569840401411,
+      "gflops": 0.04162300324328302,
+      "trials": 20
+    },
+    {
+      "op": "tridiagonal_solve",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 16384,
+      "latency_ms": 0.7469590054824948,
+      "gflops": 0.17547415458942708,
+      "trials": 20
+    }
+  ],
+  "score": 1.0
+}

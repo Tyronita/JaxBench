@@ -1,0 +1,49 @@
+{
+  "task": "threefry_uniform__gpu__f32",
+  "op": "threefry_uniform",
+  "file": "jaxlib/gpu/prng_kernels.cu.cc",
+  "device": "gpu",
+  "dtype": "f32",
+  "build_target": "//jaxlib/cuda:_prng",
+  "ts": 1779729142.5301719,
+  "correctness": {
+    "passed": true,
+    "worst_residual": 0.009414193885100897,
+    "tol": 0.05,
+    "per_size": {
+      "65536": 0.009414193885100897,
+      "1048576": 0.00041433758891074035,
+      "16777216": 0.0004453631837638139
+    }
+  },
+  "perf": [
+    {
+      "op": "threefry_uniform",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 65536,
+      "latency_ms": 146.01285551907495,
+      "gflops": 0.0004488371915405658,
+      "trials": 20
+    },
+    {
+      "op": "threefry_uniform",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 1048576,
+      "latency_ms": 218.23830000357702,
+      "gflops": 0.004804729508902944,
+      "trials": 20
+    },
+    {
+      "op": "threefry_uniform",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 16777216,
+      "latency_ms": 214.96105400728993,
+      "gflops": 0.07804770067526295,
+      "trials": 20
+    }
+  ],
+  "score": 1.0
+}

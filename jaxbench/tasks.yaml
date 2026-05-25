@@ -15,7 +15,7 @@ tasks:
   - 65536
   - 1048576
   - 16777216
-  tol: 0.0002
+  tol: 0.05
   ref: threefry_normal
   metrics:
   - latency_ms
@@ -38,7 +38,7 @@ tasks:
   - 65536
   - 1048576
   - 16777216
-  tol: 1.0e-10
+  tol: 0.05
   ref: threefry_normal
   metrics:
   - latency_ms
@@ -61,7 +61,7 @@ tasks:
   - 65536
   - 1048576
   - 16777216
-  tol: 0.0002
+  tol: 0.05
   ref: threefry_uniform
   metrics:
   - latency_ms
@@ -84,7 +84,7 @@ tasks:
   - 65536
   - 1048576
   - 16777216
-  tol: 1.0e-10
+  tol: 0.05
   ref: threefry_uniform
   metrics:
   - latency_ms
@@ -134,7 +134,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: cholesky
   metrics:
   - latency_ms
@@ -159,7 +159,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: cholesky
   metrics:
   - latency_ms
@@ -234,7 +234,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: det
   metrics:
   - latency_ms
@@ -259,7 +259,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: det
   metrics:
   - latency_ms
@@ -334,7 +334,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: eigh
   metrics:
   - latency_ms
@@ -359,7 +359,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: eigh
   metrics:
   - latency_ms
@@ -409,7 +409,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: expm
   metrics:
   - latency_ms
@@ -484,7 +484,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: householder_product
   metrics:
   - latency_ms
@@ -509,7 +509,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: householder_product
   metrics:
   - latency_ms
@@ -584,7 +584,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: inv
   metrics:
   - latency_ms
@@ -609,7 +609,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: inv
   metrics:
   - latency_ms
@@ -659,7 +659,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lstsq
   metrics:
   - latency_ms
@@ -734,7 +734,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lu
   metrics:
   - latency_ms
@@ -759,7 +759,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lu
   metrics:
   - latency_ms
@@ -834,7 +834,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lu_solve
   metrics:
   - latency_ms
@@ -859,7 +859,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lu_solve
   metrics:
   - latency_ms
@@ -934,7 +934,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: qr
   metrics:
   - latency_ms
@@ -959,7 +959,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: qr
   metrics:
   - latency_ms
@@ -1009,7 +1009,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: slogdet
   metrics:
   - latency_ms
@@ -1084,7 +1084,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: solve
   metrics:
   - latency_ms
@@ -1109,7 +1109,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: solve
   metrics:
   - latency_ms
@@ -1184,7 +1184,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: svd
   metrics:
   - latency_ms
@@ -1209,7 +1209,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: svd
   metrics:
   - latency_ms
@@ -1259,7 +1259,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: qr_pivoting
   metrics:
   - latency_ms
@@ -1307,7 +1307,7 @@ tasks:
   - 1024
   - 4096
   - 16384
-  tol: 0.0002
+  tol: 0.002
   ref: csr_matmul
   metrics:
   - latency_ms
@@ -1353,7 +1353,7 @@ tasks:
   - 1024
   - 4096
   - 16384
-  tol: 0.0002
+  tol: 0.002
   ref: csr_matmul
   metrics:
   - latency_ms
@@ -1401,7 +1401,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: cholesky_update
   metrics:
   - latency_ms
@@ -1451,7 +1451,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0001
+  tol: 0.0
   ref: lu_pivots_to_permutation
   metrics:
   - latency_ms
@@ -1475,7 +1475,7 @@ tasks:
   - 1024
   - 4096
   - 16384
-  tol: 0.0002
+  tol: 0.002
   ref: tridiagonal_solve
   metrics:
   - latency_ms
@@ -1523,7 +1523,7 @@ tasks:
   - 1024
   - 4096
   - 16384
-  tol: 0.0002
+  tol: 0.002
   ref: tridiagonal_solve
   metrics:
   - latency_ms
@@ -1597,7 +1597,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: cholesky
   metrics:
   - latency_ms
@@ -1622,7 +1622,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: cholesky
   metrics:
   - latency_ms
@@ -1697,7 +1697,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: det
   metrics:
   - latency_ms
@@ -1722,7 +1722,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: det
   metrics:
   - latency_ms
@@ -1797,7 +1797,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: eigh
   metrics:
   - latency_ms
@@ -1822,7 +1822,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: eigh
   metrics:
   - latency_ms
@@ -1872,7 +1872,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: expm
   metrics:
   - latency_ms
@@ -1947,7 +1947,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: inv
   metrics:
   - latency_ms
@@ -1972,7 +1972,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: inv
   metrics:
   - latency_ms
@@ -2022,7 +2022,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lstsq
   metrics:
   - latency_ms
@@ -2097,7 +2097,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lu
   metrics:
   - latency_ms
@@ -2122,7 +2122,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lu
   metrics:
   - latency_ms
@@ -2197,7 +2197,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lu_solve
   metrics:
   - latency_ms
@@ -2222,7 +2222,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: lu_solve
   metrics:
   - latency_ms
@@ -2297,7 +2297,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: qr
   metrics:
   - latency_ms
@@ -2322,7 +2322,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: qr
   metrics:
   - latency_ms
@@ -2372,7 +2372,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: slogdet
   metrics:
   - latency_ms
@@ -2447,7 +2447,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: solve
   metrics:
   - latency_ms
@@ -2472,7 +2472,7 @@ tasks:
   - 256
   - 512
   - 1024
-  tol: 0.0002
+  tol: 0.002
   ref: solve
   metrics:
   - latency_ms

@@ -60,11 +60,18 @@ def score(rec: dict) -> float:
     return float(rec.get("score", 0.0))
 
 
+def _json_safe(o):
+    # numpy scalars (e.g. residuals) are not JSON-serialisable by default
+    if hasattr(o, "item"):
+        return o.item()
+    return str(o)
+
+
 def save(rec: dict) -> str:
     os.makedirs(RESULTS_DIR, exist_ok=True)
     path = os.path.join(RESULTS_DIR, f"result_{rec['task']}.json")
     with open(path, "w") as f:
-        json.dump(rec, f, indent=2)
+        json.dump(rec, f, indent=2, default=_json_safe)
     return path
 
 

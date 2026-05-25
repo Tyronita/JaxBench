@@ -1,0 +1,69 @@
+{
+  "task": "solve__gpu__f32",
+  "op": "solve",
+  "file": "jaxlib/gpu/solver_kernels_ffi.cc",
+  "device": "gpu",
+  "dtype": "f32",
+  "build_target": "//jaxlib/cuda:_solver",
+  "ts": 1779729138.8375647,
+  "correctness": {
+    "passed": true,
+    "worst_residual": 5.892994181522226e-07,
+    "tol": 0.002,
+    "per_size": {
+      "64": 1.965154581284878e-07,
+      "128": 2.9490868769244116e-07,
+      "256": 4.338117776114814e-07,
+      "512": 5.892994181522226e-07,
+      "1024": 5.683529025191092e-07
+    }
+  },
+  "perf": [
+    {
+      "op": "solve",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 64,
+      "latency_ms": 0.8411429880652577,
+      "gflops": 0.21750721252219798,
+      "trials": 20
+    },
+    {
+      "op": "solve",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 128,
+      "latency_ms": 0.6957454897928983,
+      "gflops": 2.0565987912609516,
+      "trials": 20
+    },
+    {
+      "op": "solve",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 256,
+      "latency_ms": 1.2376965023577213,
+      "gflops": 9.142695842729406,
+      "trials": 20
+    },
+    {
+      "op": "solve",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 512,
+      "latency_ms": 1.811887981602922,
+      "gflops": 49.673475538874435,
+      "trials": 20
+    },
+    {
+      "op": "solve",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 1024,
+      "latency_ms": 4.933770018396899,
+      "gflops": 145.512464502741,
+      "trials": 20
+    }
+  ],
+  "score": 1.0
+}

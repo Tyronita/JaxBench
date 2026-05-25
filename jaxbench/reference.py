@@ -76,6 +76,6 @@ def residual(op: str, inp: dict, out) -> float:
     if op in ("threefry_uniform", "threefry_normal"):
         x = np.asarray(out).ravel()
         if op == "threefry_uniform":
-            return max(abs(x.mean() - 0.5), abs(x.var() - 1/12)) * 3  # loose statistical
-        return max(abs(x.mean()), abs(x.var() - 1.0)) * 0.5
+            return float(max(abs(x.mean() - 0.5), abs(x.var() - 1/12)) * 3)  # statistical
+        return float(max(abs(x.mean()), abs(x.var() - 1.0)) * 0.5)
     raise KeyError(f"no reference for op {op!r}")

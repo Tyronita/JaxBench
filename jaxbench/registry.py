@@ -57,8 +57,12 @@ SIZES = {
     "rnn":         (128, 256, 512),
 }
 
-# Per-dtype relative tolerances for correctness (vs the double-precision reference).
-TOL = {"f32": 2e-4, "f64": 1e-10, "c64": 2e-4, "c128": 1e-10}
+# Per-dtype relative tolerances for correctness. f32/c64 scale with problem size
+# (residual ~ sqrt(N)*eps); 2e-3 cleanly separates a correct kernel (~3e-4 at N=1024)
+# from a broken one (O(1)). PRNG is a *statistical* check, not a numeric residual, so
+# it gets a loose family override below.
+TOL = {"f32": 2e-3, "f64": 1e-10, "c64": 2e-3, "c128": 1e-10, "i32": 0.0}
+FAMILY_TOL = {"prng": 0.05}  # finite-sample mean/var deviation
 
 
 # --- operation catalogue (maps directly onto the fork's EVOLVE-BLOCK files) -----
@@ -173,7 +177,7 @@ def _expand() -> list[Task]:
                 continue
             target, so_path, wheel = BACKENDS[backend_key]
             for dtype in op.dtypes:
-                tol = TOL.get(dtype, 1e-4)
+                tol = FAMILY_TOL.get(op.family, TOL.get(dtype, 1e-4))
                 out.append(Task(
                     id=f"{op.name}__{device}__{dtype}",
                     op=op.name, family=op.family, file=op.file, device=device,

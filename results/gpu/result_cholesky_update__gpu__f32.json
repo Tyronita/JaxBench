@@ -1,0 +1,69 @@
+{
+  "task": "cholesky_update__gpu__f32",
+  "op": "cholesky_update",
+  "file": "jaxlib/gpu/linalg_kernels.cu.cc",
+  "device": "gpu",
+  "dtype": "f32",
+  "build_target": "//jaxlib/cuda:_linalg",
+  "ts": 1779729122.3176484,
+  "correctness": {
+    "passed": true,
+    "worst_residual": 9.38232673775019e-08,
+    "tol": 0.002,
+    "per_size": {
+      "64": 7.788475642200865e-08,
+      "128": 7.369668963974618e-08,
+      "256": 8.822884467463155e-08,
+      "512": 8.237363857688251e-08,
+      "1024": 9.38232673775019e-08
+    }
+  },
+  "perf": [
+    {
+      "op": "cholesky_update",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 64,
+      "latency_ms": 1.295735506573692,
+      "gflops": 0.01896683379850122,
+      "trials": 20
+    },
+    {
+      "op": "cholesky_update",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 128,
+      "latency_ms": 1.9042544881813228,
+      "gflops": 0.05162335213603,
+      "trials": 20
+    },
+    {
+      "op": "cholesky_update",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 256,
+      "latency_ms": 2.325823501450941,
+      "gflops": 0.16906527935361226,
+      "trials": 20
+    },
+    {
+      "op": "cholesky_update",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 512,
+      "latency_ms": 4.645418986910954,
+      "gflops": 0.33858388326903127,
+      "trials": 20
+    },
+    {
+      "op": "cholesky_update",
+      "device": "gpu",
+      "dtype": "f32",
+      "n": 1024,
+      "latency_ms": 11.141164024593309,
+      "gflops": 0.564703650903269,
+      "trials": 20
+    }
+  ],
+  "score": 1.0
+}
