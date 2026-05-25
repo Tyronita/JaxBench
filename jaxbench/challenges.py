@@ -66,6 +66,37 @@ class Challenge:
     build: Build
     test: SpeedTest
 
+    @property
+    def pytests(self) -> tuple[str, ...]:
+        """The pytest node-ids that gate this challenge's correctness."""
+        base = (f"tests/test_challenges.py::test_challenge_correct[{self.id}]",)
+        if self.tier == "jaxlib_kernel":
+            return base + (
+                f"tests/test_correctness.py::test_task_correct[{self.test.workload}*]",
+                "tests/test_integration.py",
+            )
+        return base + ("tests/test_xla_core.py",)
+
+    @property
+    def vals(self) -> tuple[str, ...]:
+        """The values we measure for this challenge (the eval metrics)."""
+        if self.test.workload.startswith("threefry"):
+            return ("determinism", "uniform_mean_var", "latency_ms", "speedup_vs_stock")
+        if self.tier == "xla_core":
+            return ("correctness_residual", "compile_time_ms", "exec_latency_ms",
+                    "speedup_vs_stock")
+        flop_ops = {"lu", "qr", "svd", "eigh", "cholesky", "solve", "inv",
+                    "cholesky_update", "householder_product", "tridiagonal_solve"}
+        if self.test.workload in flop_ops:
+            return ("correctness_residual", "latency_ms", "throughput_gflops",
+                    "speedup_vs_stock")
+        return ("correctness_residual", "latency_ms", "speedup_vs_stock")
+
+    @property
+    def validation(self) -> tuple:
+        """(pytests, vals) — the correctness gate and the measured values."""
+        return (self.pytests, self.vals)
+
 
 # Hot-swap .so paths for the jaxlib extensions
 _SO = {"_solver": "jax_cuda12_plugin/_solver.so", "_linalg": "jax_cuda12_plugin/_linalg.so",
@@ -219,6 +250,8 @@ def dump_yaml(path: str) -> int:
     for c in CHALLENGES:
         d = asdict(c)
         d["build"]["command"] = c.build.command()
+        d["pytests"] = list(c.pytests)
+        d["vals"] = list(c.vals)
         rows.append(d)
     with open(path, "w") as f:
         yaml.safe_dump({"version": 2, "n_challenges": len(rows),

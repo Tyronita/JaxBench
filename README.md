@@ -55,6 +55,59 @@ candidate C++  ──▶  build (tier-aware)  ──▶  apply (.so hot-swap | w
 
 `python -m jaxbench.challenge_runner <challenge_id> --device gpu --build`
 
+## The 15 hot paths — file, build, and what we measure
+
+All builds share `bazel build --repo_env=HERMETIC_PYTHON_VERSION=3.12 --disk_cache=/data/bazel-disk --features=-layering_check`. Below is the per-path delta (flags + target), how the result is applied, the rebuild cost, the speed-up test, and the **values measured**.
+
+
+### Tier 1 — jaxlib kernels (targeted `.so` + hot-swap) — 10 hot paths
+
+| # | challenge | file · edit | `BASE` + … | rebuild | speed-up test | vals measured |
+|--:|---|---|---|--:|---|---|
+| 1 | `linalg_lu_getrf` | `jaxlib/gpu/solver_kernels_ffi.cc` · GetrfImpl / EVOLVE-BLOCK | `--config=cuda_libraries_from_stubs //jaxlib/cuda:_solver` → swap `_solver.so` | ~7.0s | `lu` 256…2048, gpu,cpu,tpu | correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock |
+| 2 | `linalg_qr_geqrf` | `jaxlib/gpu/solver_kernels_ffi.cc` · GeqrfImpl / OrgqrImpl | `--config=cuda_libraries_from_stubs //jaxlib/cuda:_solver` → swap `_solver.so` | ~7.0s | `qr` 256…2048, gpu,cpu,tpu | correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock |
+| 3 | `linalg_svd_gesvd` | `jaxlib/gpu/solver_kernels_ffi.cc` · GesvdImpl | `--config=cuda_libraries_from_stubs //jaxlib/cuda:_solver` → swap `_solver.so` | ~7.0s | `svd` 256…1024, gpu,cpu,tpu | correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock |
+| 4 | `linalg_eigh_syevd` | `jaxlib/gpu/solver_kernels_ffi.cc` · SyevdImpl | `--config=cuda_libraries_from_stubs //jaxlib/cuda:_solver` → swap `_solver.so` | ~7.0s | `eigh` 256…1024, gpu,cpu,tpu | correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock |
+| 5 | `linalg_cholesky_update` | `jaxlib/gpu/linalg_kernels.cu.cc` · drotg / CholeskyUpdateKernel (EVOLVE-BLOCK) | `--config=cuda_libraries_from_stubs --config=build_cuda_with_clang //jaxlib/cuda:_linalg` → swap `_linalg.so` | ~12.9s | `cholesky_update` 256…1024, gpu | correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock |
+| 6 | `linalg_tridiagonal_solve` | `jaxlib/tridiagonal_solve_perturbed.h` · MaybePerturbPivot (EVOLVE-BLOCK) | `--config=cuda_libraries_from_stubs --config=build_cuda_with_clang //jaxlib/cuda:_linalg` → swap `_linalg.so` | ~17.0s | `tridiagonal_solve` 1024…16384, gpu,cpu | correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock |
+| 7 | `linalg_householder` | `jaxlib/gpu/householder_kernels.cu.cc` · ProductOf...Reflectors...Kernel | `--config=cuda_libraries_from_stubs --config=build_cuda_with_clang //jaxlib/cuda:_solver` → swap `_solver.so` | ~5.5s | `householder_product` 256…1024, gpu | correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock |
+| 8 | `prng_threefry` | `jaxlib/gpu/prng_kernels.cu.cc` · ThreeFry2x32Kernel (EVOLVE-BLOCK) | `--config=cuda_libraries_from_stubs --config=build_cuda_with_clang //jaxlib/cuda:_prng` → swap `_prng.so` | ~4.8s | `threefry_uniform` 262144…16777216, gpu | determinism, uniform_mean_var, latency_ms, speedup_vs_stock |
+| 9 | `sparse_csr_matmul` | `jaxlib/gpu/sparse_kernels.cc` · CsrMatmul (EVOLVE-BLOCK) | `--config=cuda_libraries_from_stubs //jaxlib/cuda:_sparse` → swap `_sparse.so` | ~8.4s | `csr_matmul` 1024…16384, gpu,cpu | correctness_residual, latency_ms, speedup_vs_stock |
+| 10 | `lapack_cpu_backend` | `jaxlib/cpu/lapack_kernels.cc` · TriMatrixEquationSolver / EVOLVE-BLOCK | `//jaxlib/cpu:_lapack` → swap `_lapack.so` | ~22.7s | `lu` 256…1024, cpu | correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock |
+
+### Tier 2 — XLA core graph (`--override_repository`, rebuild+reinstall) — 5 hot paths
+
+| # | challenge | file · edit | `BASE` + … | rebuild | speed-up test | vals measured |
+|--:|---|---|---|--:|---|---|
+| 1 | `xla_scan_expander` | `xla/service/scan_expander.cc` · ExpandInstruction / scan->while lowering | `--config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local //jaxlib/tools:jax_cuda12_plugin_wheel` → reinstall wheel | ~60.0s | `scan_cumsum` 1024…65536, gpu,cpu,tpu | correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock |
+| 2 | `xla_while_loop_simplifier` | `xla/service/while_loop_simplifier.cc` · while-loop simplification pass | `--config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local //jaxlib/tools:jax_cuda12_plugin_wheel` → reinstall wheel | ~60.0s | `while_loop_iter` 1000…100000, gpu,cpu,tpu | correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock |
+| 3 | `xla_algebraic_simplifier` | `xla/hlo/transforms/simplifiers/algebraic_simplifier.cc` · the simplifier rules | `--config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local //jaxlib/tools:jax_cuda12_plugin_wheel` → reinstall wheel | ~43.0s | `algebra_graph` 512…2048, gpu,cpu,tpu | correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock |
+| 4 | `xla_instruction_fusion` | `xla/service/instruction_fusion.cc` · fusion decisions | `--config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local //jaxlib/tools:jax_cuda12_plugin_wheel` → reinstall wheel | ~60.0s | `elementwise_chain` 1048576…16777216, gpu,tpu | correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock |
+| 5 | `xla_hlo_instruction` | `xla/hlo/ir/hlo_instruction.cc` · core IR routines | `--config=cuda_libraries_from_stubs --override_repository=xla=/data/xla-local //jaxlib/tools:jax_cuda12_plugin_wheel` → reinstall wheel | ~27.0s | `compile_time_graph` 256…512, gpu,cpu | correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock |
+
+### Validation per hot path — `(pytests, vals)`
+
+Each challenge advertises the correctness pytests that gate it and the values measured:
+
+| challenge | pytests | vals |
+|---|---|---|
+| `linalg_lu_getrf` | `tests/test_challenges.py::test_challenge_correct[linalg_lu_getrf]` · `tests/test_correctness.py::test_task_correct[lu*]` · `tests/test_integration.py` | (correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock) |
+| `linalg_qr_geqrf` | `tests/test_challenges.py::test_challenge_correct[linalg_qr_geqrf]` · `tests/test_correctness.py::test_task_correct[qr*]` · `tests/test_integration.py` | (correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock) |
+| `linalg_svd_gesvd` | `tests/test_challenges.py::test_challenge_correct[linalg_svd_gesvd]` · `tests/test_correctness.py::test_task_correct[svd*]` · `tests/test_integration.py` | (correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock) |
+| `linalg_eigh_syevd` | `tests/test_challenges.py::test_challenge_correct[linalg_eigh_syevd]` · `tests/test_correctness.py::test_task_correct[eigh*]` · `tests/test_integration.py` | (correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock) |
+| `linalg_cholesky_update` | `tests/test_challenges.py::test_challenge_correct[linalg_cholesky_update]` · `tests/test_correctness.py::test_task_correct[cholesky_update*]` · `tests/test_integration.py` | (correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock) |
+| `linalg_tridiagonal_solve` | `tests/test_challenges.py::test_challenge_correct[linalg_tridiagonal_solve]` · `tests/test_correctness.py::test_task_correct[tridiagonal_solve*]` · `tests/test_integration.py` | (correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock) |
+| `linalg_householder` | `tests/test_challenges.py::test_challenge_correct[linalg_householder]` · `tests/test_correctness.py::test_task_correct[householder_product*]` · `tests/test_integration.py` | (correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock) |
+| `prng_threefry` | `tests/test_challenges.py::test_challenge_correct[prng_threefry]` · `tests/test_correctness.py::test_task_correct[threefry_uniform*]` · `tests/test_integration.py` | (determinism, uniform_mean_var, latency_ms, speedup_vs_stock) |
+| `sparse_csr_matmul` | `tests/test_challenges.py::test_challenge_correct[sparse_csr_matmul]` · `tests/test_correctness.py::test_task_correct[csr_matmul*]` · `tests/test_integration.py` | (correctness_residual, latency_ms, speedup_vs_stock) |
+| `lapack_cpu_backend` | `tests/test_challenges.py::test_challenge_correct[lapack_cpu_backend]` · `tests/test_correctness.py::test_task_correct[lu*]` · `tests/test_integration.py` | (correctness_residual, latency_ms, throughput_gflops, speedup_vs_stock) |
+| `xla_scan_expander` | `tests/test_challenges.py::test_challenge_correct[xla_scan_expander]` · `tests/test_xla_core.py` | (correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock) |
+| `xla_while_loop_simplifier` | `tests/test_challenges.py::test_challenge_correct[xla_while_loop_simplifier]` · `tests/test_xla_core.py` | (correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock) |
+| `xla_algebraic_simplifier` | `tests/test_challenges.py::test_challenge_correct[xla_algebraic_simplifier]` · `tests/test_xla_core.py` | (correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock) |
+| `xla_instruction_fusion` | `tests/test_challenges.py::test_challenge_correct[xla_instruction_fusion]` · `tests/test_xla_core.py` | (correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock) |
+| `xla_hlo_instruction` | `tests/test_challenges.py::test_challenge_correct[xla_hlo_instruction]` · `tests/test_xla_core.py` | (correctness_residual, compile_time_ms, exec_latency_ms, speedup_vs_stock) |
+
+
 ## Serverless, cross-device
 
 A candidate evaluation is a pure function, so it fans out one-invocation-per-candidate
@@ -64,6 +117,25 @@ build is paid once globally; each candidate then does only the targeted rebuild
 (`DEVICE=cpu|cuda|tpu`), `serverless/` (handler + Modal app + GCP-TPU path), and
 `infra/` (Azure CPU VM + GCP TPU VM) make this one command per device.
 Details + recommendation: [`serverless/README.md`](serverless/README.md).
+
+### Prebuilt images per device (anonymised registry)
+
+Every device + setup has a build-ready image so the loop runs anywhere. Registry refs
+are **anonymised** — set `JAXBENCH_REGISTRY` to your own (e.g. an Azure Container
+Registry) before building. `REGISTRY = ${JAXBENCH_REGISTRY:-your-registry.azurecr.io/jaxbench}`.
+
+| device | eval image | build image (bazel+clang) | serverless runtime |
+|---|---|---|---|
+| **GPU** A100/H100 | `${REGISTRY}/runtime-cuda:0.2.0` | `${REGISTRY}/build-cuda:0.2.0` | Modal / RunPod / ACI-GPU / GKE |
+| **CPU** many-core | `${REGISTRY}/runtime-cpu:0.2.0` | `${REGISTRY}/build-cpu:0.2.0` | Cloud Run / Azure Container Apps / Fargate |
+| **TPU** | `${REGISTRY}/runtime-tpu:0.2.0` | `${REGISTRY}/build-tpu:0.2.0` | GCP Cloud Run TPU / GKE / TPU VM |
+
+Build them all (eval + build variants, every device) in one command:
+```bash
+JAXBENCH_REGISTRY=<your-acr>.azurecr.io/jaxbench docker buildx bake -f docker/bake.hcl all
+# or: bash docker/build_all.sh            # plain docker build; PUSH=1 to push
+```
+Full table + run examples: [`docker/REGISTRY.md`](docker/REGISTRY.md).
 
 ## Validated on real hardware
 
@@ -108,9 +180,10 @@ python -m jaxbench.challenge_runner xla_scan_expander --device cpu   # run one (
 ## Layout
 
 ```
-jaxbench/  challenges(dataset) · workloads(speed-up tests) · challenge_runner
+jaxbench/  challenges(dataset+validation tuples) · workloads(speed-up tests) · challenge_runner
            build(targeted .so + XLA override) · ops · reference · bench · metrics · sharding
-docker/    build+eval image (DEVICE=cpu|cuda|tpu)
+tests/     test_challenges (per-challenge correctness gate) · test_xla_core · test_correctness · test_integration
+docker/    Dockerfile (DEVICE=cpu|cuda|tpu) · bake.hcl · build_all.sh · REGISTRY.md (anonymised)
 serverless/ runtime-agnostic handler · Modal app · cross-device guide
 infra/     az (CPU VM) + gcloud (TPU VM) provisioning
 shinka/    ShinkaEvolve evaluator + launcher (the evolutionary driver)

@@ -36,6 +36,15 @@ challenges:
     - cpu
     - tpu
     correctness: lu_reconstruct
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[linalg_lu_getrf]
+  - tests/test_correctness.py::test_task_correct[lu*]
+  - tests/test_integration.py
+  vals:
+  - correctness_residual
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_stock
 - id: linalg_qr_geqrf
   tier: jaxlib_kernel
   title: QR decomposition (geqrf/orgqr)
@@ -68,6 +77,15 @@ challenges:
     - cpu
     - tpu
     correctness: qr_reconstruct
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[linalg_qr_geqrf]
+  - tests/test_correctness.py::test_task_correct[qr*]
+  - tests/test_integration.py
+  vals:
+  - correctness_residual
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_stock
 - id: linalg_svd_gesvd
   tier: jaxlib_kernel
   title: SVD (gesvd/gesvdj)
@@ -97,6 +115,15 @@ challenges:
     - cpu
     - tpu
     correctness: svd_reconstruct
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[linalg_svd_gesvd]
+  - tests/test_correctness.py::test_task_correct[svd*]
+  - tests/test_integration.py
+  vals:
+  - correctness_residual
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_stock
 - id: linalg_eigh_syevd
   tier: jaxlib_kernel
   title: Symmetric/Hermitian eig (syevd/heevd)
@@ -128,6 +155,15 @@ challenges:
     - cpu
     - tpu
     correctness: eigh_residual
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[linalg_eigh_syevd]
+  - tests/test_correctness.py::test_task_correct[eigh*]
+  - tests/test_integration.py
+  vals:
+  - correctness_residual
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_stock
 - id: linalg_cholesky_update
   tier: jaxlib_kernel
   title: Rank-1 Cholesky update (drotg)
@@ -157,6 +193,15 @@ challenges:
     devices:
     - gpu
     correctness: cholesky_update_residual
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[linalg_cholesky_update]
+  - tests/test_correctness.py::test_task_correct[cholesky_update*]
+  - tests/test_integration.py
+  vals:
+  - correctness_residual
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_stock
 - id: linalg_tridiagonal_solve
   tier: jaxlib_kernel
   title: Tridiagonal solve (perturbed pivots)
@@ -187,6 +232,15 @@ challenges:
     - gpu
     - cpu
     correctness: tridiagonal_residual
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[linalg_tridiagonal_solve]
+  - tests/test_correctness.py::test_task_correct[tridiagonal_solve*]
+  - tests/test_integration.py
+  vals:
+  - correctness_residual
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_stock
 - id: linalg_householder
   tier: jaxlib_kernel
   title: Householder reflector product
@@ -218,6 +272,15 @@ challenges:
     devices:
     - gpu
     correctness: householder_orthonormal
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[linalg_householder]
+  - tests/test_correctness.py::test_task_correct[householder_product*]
+  - tests/test_integration.py
+  vals:
+  - correctness_residual
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_stock
 - id: prng_threefry
   tier: jaxlib_kernel
   title: Threefry2x32 PRNG
@@ -247,6 +310,15 @@ challenges:
     devices:
     - gpu
     correctness: prng_statistical
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[prng_threefry]
+  - tests/test_correctness.py::test_task_correct[threefry_uniform*]
+  - tests/test_integration.py
+  vals:
+  - determinism
+  - uniform_mean_var
+  - latency_ms
+  - speedup_vs_stock
 - id: sparse_csr_matmul
   tier: jaxlib_kernel
   title: "CSR sparse \xD7 dense matmul"
@@ -275,6 +347,14 @@ challenges:
     - gpu
     - cpu
     correctness: csr_vs_dense
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[sparse_csr_matmul]
+  - tests/test_correctness.py::test_task_correct[csr_matmul*]
+  - tests/test_integration.py
+  vals:
+  - correctness_residual
+  - latency_ms
+  - speedup_vs_stock
 - id: lapack_cpu_backend
   tier: jaxlib_kernel
   title: CPU LAPACK backend (lu/qr/svd/eigh)
@@ -302,6 +382,15 @@ challenges:
     devices:
     - cpu
     correctness: lu_reconstruct
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[lapack_cpu_backend]
+  - tests/test_correctness.py::test_task_correct[lu*]
+  - tests/test_integration.py
+  vals:
+  - correctness_residual
+  - latency_ms
+  - throughput_gflops
+  - speedup_vs_stock
 - id: xla_scan_expander
   tier: xla_core
   title: Scan lowering (jax.lax.scan)
@@ -334,6 +423,14 @@ challenges:
     - cpu
     - tpu
     correctness: scan_vs_reference
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[xla_scan_expander]
+  - tests/test_xla_core.py
+  vals:
+  - correctness_residual
+  - compile_time_ms
+  - exec_latency_ms
+  - speedup_vs_stock
 - id: xla_while_loop_simplifier
   tier: xla_core
   title: While-loop simplification
@@ -364,6 +461,14 @@ challenges:
     - cpu
     - tpu
     correctness: while_vs_reference
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[xla_while_loop_simplifier]
+  - tests/test_xla_core.py
+  vals:
+  - correctness_residual
+  - compile_time_ms
+  - exec_latency_ms
+  - speedup_vs_stock
 - id: xla_algebraic_simplifier
   tier: xla_core
   title: Algebraic simplification pass
@@ -394,6 +499,14 @@ challenges:
     - cpu
     - tpu
     correctness: graph_vs_reference
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[xla_algebraic_simplifier]
+  - tests/test_xla_core.py
+  vals:
+  - correctness_residual
+  - compile_time_ms
+  - exec_latency_ms
+  - speedup_vs_stock
 - id: xla_instruction_fusion
   tier: xla_core
   title: Instruction fusion
@@ -423,6 +536,14 @@ challenges:
     - gpu
     - tpu
     correctness: graph_vs_reference
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[xla_instruction_fusion]
+  - tests/test_xla_core.py
+  vals:
+  - correctness_residual
+  - compile_time_ms
+  - exec_latency_ms
+  - speedup_vs_stock
 - id: xla_hlo_instruction
   tier: xla_core
   title: Core HLO IR (hlo_instruction)
@@ -452,3 +573,11 @@ challenges:
     - gpu
     - cpu
     correctness: graph_vs_reference
+  pytests:
+  - tests/test_challenges.py::test_challenge_correct[xla_hlo_instruction]
+  - tests/test_xla_core.py
+  vals:
+  - correctness_residual
+  - compile_time_ms
+  - exec_latency_ms
+  - speedup_vs_stock
