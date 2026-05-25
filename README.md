@@ -110,6 +110,10 @@ one extension `.so`, hot-swap it (the plugin is 11 independent `.so`s). Never mu
 XLA core graph code (134 s / 98-library fan-out). Full detail:
 [`docs/METHODOLOGY.md`](docs/METHODOLOGY.md).
 
+> **Validated end-to-end on the A100:** a fork-built `_linalg.so` hot-swapped into a
+> stock `jax[cuda12]` install loaded and ran `cholesky_update` correctly (residual
+> 9.4e-8) — i.e. the whole mutate→build→hot-swap→run loop works on real hardware.
+
 ## Evolving with ShinkaEvolve (real dependency)
 
 ```bash
