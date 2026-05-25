@@ -1,102 +1,90 @@
 # JaxBench — the plan
 
-*KernelBench, but for **evolving** JAX/`jaxlib` kernels — and engineered so the
-rebuild is fast enough that an evolutionary loop is actually practical.*
+**A dataset of optimization challenges on JAX's own hot paths. KernelBench, but the
+thing you optimize is JAX itself: change a solver or a graph pass in C++, rebuild JAX,
+keep it correct, make it faster.**
 
 **Repo:** https://github.com/Tyronita/JaxBench ·
-**Fork test branch:** `Tyronita/jax @ shinka/jaxbench-tests` ·
-**Driver:** [ShinkaEvolve](https://github.com/SakanaAI/ShinkaEvolve) ·
+**Driver:** [ShinkaEvolve](https://github.com/SakanaAI/ShinkaEvolve) (real dependency) ·
 **Goal:** ≥ 1 high-impact, approved PR to upstream `jax-ml/jax`.
 
 ---
 
-## The idea
+## What it is (and what it is *not*)
 
-KernelBench judges generated CUDA kernels by *correctness first, speedup second*.
-JaxBench applies that to the real kernels inside `jaxlib` (dense linear algebra,
-Threefry PRNG, sparse, tridiagonal), and adds the missing piece for **evolution**: a
-mutate→build→measure loop whose rebuild is seconds, not minutes.
+It is **not** a benchmark of how fast JAX is. It is a **dataset of challenges**. Each
+challenge gives you the **current C++/CUDA source** of a JAX hot path as the reference;
+you submit a **faster implementation**; JaxBench **rebuilds JAX** and scores the
+**speedup of the real library**, gated on **correctness against stock JAX**.
 
-> Correctness is a **gate** (a fast-but-wrong kernel scores 0). Speedup over the
-> unmutated baseline is the **score**. ShinkaEvolve maximises it.
+A challenge is `(file, quick build instructions, config, speed-up test)`:
+- **file** — the editable hot path (the reference impl lives here).
+- **build** — the exact targeted rebuild command + config that makes it fast/correct.
+- **speed-up test** — a JAX workload that routes through this hot path.
+- **score** — mean speedup vs stock over the test sweep; **0 if any test breaks correctness**.
 
-## Why it's hard — and how we made it fast
+## Two tiers of hot path
 
-The bottleneck of evolving a compiled kernel is the **rebuild**. We measured every
-lever on an A100 / hermetic CUDA 12.9 box and baked the winners into the loop:
+- **`jaxlib_kernel`** — leaf C++/CUDA kernels: LU/QR/SVD/eigh/Cholesky solvers,
+  Threefry PRNG, sparse, tridiagonal. Cheap to rebuild (~4–23 s) via a targeted
+  extension-`.so` build + hot-swap.
+- **`xla_core`** — XLA compiler-graph logic: **scan/while lowering, the algebraic
+  simplifier, instruction fusion, HLO IR**. This is where the *computational* wins are
+  — making `jax.lax.scan`, expensive ops, and fusion genuinely faster makes a whole
+  class of programs faster. Costlier to rebuild (~27–134 s, via
+  `--override_repository`), which is exactly why the loop runs serverless + parallel.
 
-| approach | per-edit rebuild |
-|---|--:|
-| naive full `nvcc` wheel | ~21 s |
-| targeted extension `.so`, `nvcc` | ~17 s |
-| **targeted `.so`, clang device compiler + `.so` hot-swap** | **~13 s** (device) / ~4 s (host) |
+(15 challenges today: 10 kernel + 5 XLA core. The `scan_expander` challenge is the
+"scan expensive operations" target directly.)
 
-Recipe: content-addressed `--disk_cache` on a big disk · build **one GPU arch**
-(`sm_80`) · **clang** as the CUDA device compiler (−25–36 %) · rebuild only the one
-affected extension · **hot-swap** the `.so` into the venv instead of repackaging a
-wheel · `-c opt` (fastbuild is *not* faster for device code). And the hard rule:
-**never mutate XLA core graph code** — editing `xla/hlo/ir/hlo_instruction.h` triggers
-a 134 s / 237-action rebuild (fans out to 98 libraries); mainstream DL ops are
-XLA-codegen'd anyway. Keep mutations in leaf `jaxlib` kernels.
+## The loop
 
-## What's in the benchmark
+```
+candidate C++ ─▶ build (tier-aware) ─▶ apply (.so hot-swap | wheel reinstall)
+                                          │
+  score = mean speedup vs stock ◀─ speed-up test ─▶ correctness vs stock JAX
+  (0 if incorrect)                  (jax.lax.scan / jnp.linalg.* / fusible graph / …)
+```
 
-- **100 tasks** = op × device × dtype, generated from `jaxbench/registry.py`, each
-  pinning the JAX op, the backing `jaxlib` file (the mutation surface), the build
-  target, the extension `.so`, and the N-sweep. Full table: `docs/TARGETS_TOP100.md`.
-  Families: LU/QR/SVD/eigh/solve/inv/cholesky/det/expm/lstsq, Threefry PRNG, CSR
-  sparse, tridiagonal — on GPU (`jax-cuda-plugin`) and CPU (`jaxlib`), f32/f64/c64/c128.
-- **Correctness gate**: property residuals (`QR≈A`, `A·x≈b`, `L·Lᴴ≈A`, …) robust to
-  factorisation non-uniqueness; dtype-scaled tolerances; determinism checks.
-  Parameterised over all 100 tasks — **validated green on CPU** (GPU tasks auto-skip
-  without a GPU).
-- **Perf harness** with correct JAX timing hygiene (warmup excluded, inputs staged
-  once, `block_until_ready`, median of 20), op-specific GFLOP/s, speedup.
-- **Build + hot-swap** module implementing the fast loop; **multi-GPU sharding** eval
-  (`jaxbench/sharding.py`) to confirm wins hold under data-parallel batches.
-- **ShinkaEvolve adapter** (`shinka/`): one island per file, ordered cheapest-rebuild
-  first; fitness = mean speedup, 0 if correctness fails; baseline recorder.
+## Serverless, cross-device
 
-## Methodology highlights
+A candidate eval is a pure function, so it fans out one-invocation-per-candidate across
+**GPU, TPU, and CPU**. Mount a warm bazel `--disk_cache` read-only so the cold build is
+paid once globally; each candidate then does only the targeted rebuild (kernels) or an
+XLA override build (parallelised). `docker/Dockerfile` (`DEVICE=cpu|cuda|tpu`),
+`serverless/` (runtime-agnostic handler + Modal app + GCP-TPU path), and `infra/`
+(Azure CPU VM + GCP TPU VM) make each device one command. TPUs are GCP-only.
 
-- **Target machines** are first-class: each task carries a device class; switching to
-  H100/T4 means changing the compute capability and re-recording the baseline.
-- **Side-effect-free compiles**: hermetic + content-addressed builds; the only
-  environment mutation is one atomic `.so` swap (reverted by `restore()`); correctness
-  runs in a fresh process. → safe to fan out.
-- **Serverless execution**: seed ephemeral GPU workers from a warm `--disk_cache`
-  snapshot (read-only mount); each worker rebuilds only its mutated extension
-  (seconds), evaluates its task subset in an isolated venv, and writes append-only
-  fitness JSON — one mutation per invocation, nothing shared mutated.
-- **Other GPU tooling**: Nsight/`ncu` for occupancy/bandwidth confirmation on
-  promising candidates (out of the hot loop); CUPTI/`nvidia-smi dmon` for clock/power
-  sanity during timing.
+## Why the rebuild is fast enough to evolve
 
-## The path to an upstream PR (`docs/PR_PLAYBOOK.md`)
+Per single-kernel edit: naive `nvcc` wheel ~21 s → **targeted `.so` + clang device +
+hot-swap ~13 s** (~4 s host-only). Levers: content-addressed `--disk_cache`, one GPU
+arch (`sm_80`), clang as the CUDA device compiler, build one extension `.so`, hot-swap
+it. XLA-tier edits use `--override_repository` (the http_archive cache can't be edited
+in place).
 
-1. Evolve the high-leverage islands (`prng`, `solver`, the proven tridiagonal path).
-2. Promote only candidates with a **robust speedup across the whole N-sweep and all
-   dtypes**, all JaxBench + upstream op tests green.
-3. Confirm out-of-loop with `ncu` (show the *mechanism*), build a benchmark table with
-   exact machine/toolchain versions.
-4. Open a minimal, reproducible PR against `jax-ml/jax` referencing the JaxBench task
-   ids and a two-command repro.
+## Validated on real hardware
 
-## Status
+- **A100 80GB:** stock baselines recorded; the full **mutate→build→hot-swap→run loop
+  validated end-to-end** — a fork-built `_linalg.so` hot-swapped into stock
+  `jax[cuda12]` ran `cholesky_update` correctly (residual 9.4e-8).
+- **24-core CPU:** stock baselines recorded; challenge runner verified for both tiers
+  (kernel + XLA scan/while/simplifier workloads run + correctness-check on CPU).
+- **TPU:** wired for GCP (Azure has no TPUs); no TPU numbers claimed until run there.
 
-✅ Repo published · 100-task registry · correctness gate (CPU-validated) · perf +
-sharding harness · build/hot-swap loop · ShinkaEvolve adapter · fork test branch ·
-CI · full docs.
-⏭️ Record GPU baselines on the A100 → evolve → land the first PR.
+## Path to an upstream PR
+
+Evolve a challenge until a candidate shows a **robust speedup across the whole sweep**
+with all correctness green and the upstream op/graph tests passing; confirm the
+mechanism with `ncu`; open a minimal, reproducible PR to `jax-ml/jax`. The leverage
+targets: hot kernels with simple, reviewable bodies (`solver`, `prng`, the proven
+tridiagonal path) and the high-impact graph passes (`scan`, fusion).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/Tyronita/JaxBench && cd JaxBench
 pip install -e . && pip install "jax[cpu]"
-JAX_ENABLE_X64=1 pytest tests/ -q            # correctness on CPU
-python -m jaxbench.registry                  # the 100 tasks
-# on a GPU box:
-python shinka/make_baseline.py --device gpu
-python -m jaxbench.runner threefry_uniform__gpu__f32 --build
+python -m jaxbench.challenges                                  # the dataset
+python -m jaxbench.challenge_runner xla_scan_expander --device cpu   # run one
 ```
