@@ -77,9 +77,15 @@ def build_target(target: str, *, clang_device: bool = True,
     -> the plugin wheel built against the editable XLA copy (reinstall to apply)."""
     cmd = [BAZEL, "build", f"--repo_env=HERMETIC_PYTHON_VERSION={PY_VER}",
            f"--disk_cache={DISK_CACHE}", "--features=-layering_check"]
-    if libs_from_stubs and ("//jaxlib/cuda" in target or "plugin" in target):
+    is_cuda_target = "//jaxlib/cuda" in target or "plugin" in target
+    if is_cuda_target:
+        # CUDA config that build.py --configure_only would persist to
+        # .jax_configure.bazelrc — without it, vendor.h fails to find CUPTI.
+        cmd += ["--config=cuda12",
+                "--repo_env=HERMETIC_CUDA_COMPUTE_CAPABILITIES=sm_80"]
+    if libs_from_stubs and is_cuda_target:
         cmd.append("--config=cuda_libraries_from_stubs")
-    if clang_device and "//jaxlib/cuda" in target:
+    if clang_device and is_cuda_target:
         cmd.append("--config=build_cuda_with_clang")  # ~25-36% faster device compiles
     if xla_override:
         ensure_xla_local()
