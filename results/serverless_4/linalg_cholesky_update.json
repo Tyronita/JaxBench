@@ -1,0 +1,33 @@
+{
+  "challenge": "linalg_cholesky_update",
+  "file": "jaxlib/gpu/linalg_kernels.cu.cc",
+  "build_target": "//jaxlib/cuda:_linalg.so",
+  "tag": 23262,
+  "wall_s": 117.11,
+  "build_s": 116.65,
+  "build_elapsed_s": 116.257,
+  "correct": true,
+  "worst_residual": 9.225900754472605e-08,
+  "score": 1.0028,
+  "baseline_ms": {
+    "256": 1.551,
+    "512": 2.446,
+    "1024": 4.577
+  },
+  "candidate_ms": {
+    "256": 1.554,
+    "512": 2.432,
+    "1024": 4.559
+  },
+  "pytests": [
+    "tests/test_challenges.py::test_challenge_correct[linalg_cholesky_update]",
+    "tests/test_correctness.py::test_task_correct[cholesky_update*]",
+    "tests/test_integration.py"
+  ],
+  "vals_measured": [
+    "correctness_residual",
+    "latency_ms",
+    "throughput_gflops",
+    "speedup_vs_stock"
+  ]
+}

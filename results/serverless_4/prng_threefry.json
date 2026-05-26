@@ -1,0 +1,33 @@
+{
+  "challenge": "prng_threefry",
+  "file": "jaxlib/gpu/prng_kernels.cu.cc",
+  "build_target": "//jaxlib/cuda:_prng.so",
+  "tag": 25670,
+  "wall_s": 119.3,
+  "build_s": 106.79,
+  "build_elapsed_s": 106.346,
+  "correct": true,
+  "worst_residual": 0.00017542413125185008,
+  "score": 1.0099,
+  "baseline_ms": {
+    "262144": 222.447,
+    "4194304": 216.331,
+    "16777216": 216.894
+  },
+  "candidate_ms": {
+    "262144": 217.087,
+    "4194304": 216.253,
+    "16777216": 215.865
+  },
+  "pytests": [
+    "tests/test_challenges.py::test_challenge_correct[prng_threefry]",
+    "tests/test_correctness.py::test_task_correct[threefry_uniform*]",
+    "tests/test_integration.py"
+  ],
+  "vals_measured": [
+    "determinism",
+    "uniform_mean_var",
+    "latency_ms",
+    "speedup_vs_stock"
+  ]
+}

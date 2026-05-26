@@ -1,0 +1,33 @@
+{
+  "challenge": "linalg_householder",
+  "file": "jaxlib/gpu/householder_kernels.cu.cc",
+  "build_target": "//jaxlib/cuda:_solver.so",
+  "tag": 14046,
+  "wall_s": 109.52,
+  "build_s": 109.08,
+  "build_elapsed_s": 108.668,
+  "correct": true,
+  "worst_residual": 0.0,
+  "score": 1.0292,
+  "baseline_ms": {
+    "256": 0.334,
+    "512": 0.531,
+    "1024": 1.093
+  },
+  "candidate_ms": {
+    "256": 0.316,
+    "512": 0.533,
+    "1024": 1.055
+  },
+  "pytests": [
+    "tests/test_challenges.py::test_challenge_correct[linalg_householder]",
+    "tests/test_correctness.py::test_task_correct[householder_product*]",
+    "tests/test_integration.py"
+  ],
+  "vals_measured": [
+    "correctness_residual",
+    "latency_ms",
+    "throughput_gflops",
+    "speedup_vs_stock"
+  ]
+}

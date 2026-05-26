@@ -1,0 +1,35 @@
+{
+  "challenge": "linalg_lu_getrf",
+  "file": "jaxlib/gpu/solver_kernels_ffi.cc",
+  "build_target": "//jaxlib/cuda:_solver.so",
+  "tag": 27650,
+  "wall_s": 115.85,
+  "build_s": 114.42,
+  "build_elapsed_s": 114.005,
+  "correct": true,
+  "worst_residual": 9.264930667995941e-06,
+  "score": 1.0175,
+  "baseline_ms": {
+    "256": 0.672,
+    "512": 1.451,
+    "1024": 2.974,
+    "2048": 6.984
+  },
+  "candidate_ms": {
+    "256": 0.679,
+    "512": 1.37,
+    "1024": 2.936,
+    "2048": 6.923
+  },
+  "pytests": [
+    "tests/test_challenges.py::test_challenge_correct[linalg_lu_getrf]",
+    "tests/test_correctness.py::test_task_correct[lu*]",
+    "tests/test_integration.py"
+  ],
+  "vals_measured": [
+    "correctness_residual",
+    "latency_ms",
+    "throughput_gflops",
+    "speedup_vs_stock"
+  ]
+}

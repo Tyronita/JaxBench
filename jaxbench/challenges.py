@@ -115,49 +115,49 @@ CHALLENGES: tuple[Challenge, ...] = (
         "linalg_lu_getrf", "jaxlib_kernel", "LU decomposition (getrf)",
         "jaxlib/gpu/solver_kernels_ffi.cc", "GetrfImpl / EVOLVE-BLOCK",
         "LU backs jnp.linalg.solve/inv/det and every linear-solve-heavy program.",
-        _gpu_kernel("//jaxlib/cuda:_solver", "_solver", 7.0),
+        _gpu_kernel("//jaxlib/cuda:_solver.so", "_solver", 7.0),
         SpeedTest("lu", (256, 512, 1024, 2048), ("f32", "f64", "c64", "c128"),
                   ("gpu", "cpu", "tpu"), "lu_reconstruct")),
     Challenge(
         "linalg_qr_geqrf", "jaxlib_kernel", "QR decomposition (geqrf/orgqr)",
         "jaxlib/gpu/solver_kernels_ffi.cc", "GeqrfImpl / OrgqrImpl",
         "QR backs least-squares, orthogonalization, many iterative solvers.",
-        _gpu_kernel("//jaxlib/cuda:_solver", "_solver", 7.0),
+        _gpu_kernel("//jaxlib/cuda:_solver.so", "_solver", 7.0),
         SpeedTest("qr", (256, 512, 1024, 2048), ("f32", "f64", "c64", "c128"),
                   ("gpu", "cpu", "tpu"), "qr_reconstruct")),
     Challenge(
         "linalg_svd_gesvd", "jaxlib_kernel", "SVD (gesvd/gesvdj)",
         "jaxlib/gpu/solver_kernels_ffi.cc", "GesvdImpl",
         "SVD backs PCA, low-rank, pinv, spectral methods.",
-        _gpu_kernel("//jaxlib/cuda:_solver", "_solver", 7.0),
+        _gpu_kernel("//jaxlib/cuda:_solver.so", "_solver", 7.0),
         SpeedTest("svd", (256, 512, 1024), ("f32", "f64"),
                   ("gpu", "cpu", "tpu"), "svd_reconstruct")),
     Challenge(
         "linalg_eigh_syevd", "jaxlib_kernel", "Symmetric/Hermitian eig (syevd/heevd)",
         "jaxlib/gpu/solver_kernels_ffi.cc", "SyevdImpl",
         "eigh backs spectral methods, PCA, physics; a common bottleneck.",
-        _gpu_kernel("//jaxlib/cuda:_solver", "_solver", 7.0),
+        _gpu_kernel("//jaxlib/cuda:_solver.so", "_solver", 7.0),
         SpeedTest("eigh", (256, 512, 1024), ("f32", "f64", "c64", "c128"),
                   ("gpu", "cpu", "tpu"), "eigh_residual")),
     Challenge(
         "linalg_cholesky_update", "jaxlib_kernel", "Rank-1 Cholesky update (drotg)",
         "jaxlib/gpu/linalg_kernels.cu.cc", "drotg / CholeskyUpdateKernel (EVOLVE-BLOCK)",
         "Online/streaming covariance, Kalman filters, GP updates.",
-        _gpu_kernel("//jaxlib/cuda:_linalg", "_linalg", 12.9, cu=True),
+        _gpu_kernel("//jaxlib/cuda:_linalg.so", "_linalg", 12.9, cu=True),
         SpeedTest("cholesky_update", (256, 512, 1024), ("f32", "f64"),
                   ("gpu",), "cholesky_update_residual")),
     Challenge(
         "linalg_tridiagonal_solve", "jaxlib_kernel", "Tridiagonal solve (perturbed pivots)",
         "jaxlib/tridiagonal_solve_perturbed.h", "MaybePerturbPivot (EVOLVE-BLOCK)",
         "PDE/ODE solvers, time series, banded systems; proven +41.7% in earlier work.",
-        _gpu_kernel("//jaxlib/cuda:_linalg", "_linalg", 17.0, cu=True),
+        _gpu_kernel("//jaxlib/cuda:_linalg.so", "_linalg", 17.0, cu=True),
         SpeedTest("tridiagonal_solve", (1024, 4096, 16384), ("f32", "f64"),
                   ("gpu", "cpu"), "tridiagonal_residual")),
     Challenge(
         "linalg_householder", "jaxlib_kernel", "Householder reflector product",
         "jaxlib/gpu/householder_kernels.cu.cc", "ProductOf...Reflectors...Kernel",
         "QR application step; orthogonal transforms.",
-        _gpu_kernel("//jaxlib/cuda:_solver", "_solver", 5.5, cu=True),
+        _gpu_kernel("//jaxlib/cuda:_solver.so", "_solver", 5.5, cu=True),
         SpeedTest("householder_product", (256, 512, 1024), ("f32", "f64", "c64", "c128"),
                   ("gpu",), "householder_orthonormal")),
     Challenge(
@@ -165,14 +165,14 @@ CHALLENGES: tuple[Challenge, ...] = (
         "jaxlib/gpu/prng_kernels.cu.cc", "ThreeFry2x32Kernel (EVOLVE-BLOCK)",
         "JAX's RNG — threaded through every program (init, dropout, sampling). Cheapest "
         "kernel to rebuild (~4.8s) => ideal first challenge.",
-        _gpu_kernel("//jaxlib/cuda:_prng", "_prng", 4.8, cu=True),
+        _gpu_kernel("//jaxlib/cuda:_prng.so", "_prng", 4.8, cu=True),
         SpeedTest("threefry_uniform", (1 << 18, 1 << 22, 1 << 24), ("f32",),
                   ("gpu",), "prng_statistical")),
     Challenge(
         "sparse_csr_matmul", "jaxlib_kernel", "CSR sparse × dense matmul",
         "jaxlib/gpu/sparse_kernels.cc", "CsrMatmul (EVOLVE-BLOCK)",
         "GNNs, scientific computing, sparse linear algebra.",
-        _gpu_kernel("//jaxlib/cuda:_sparse", "_sparse", 8.4),
+        _gpu_kernel("//jaxlib/cuda:_sparse.so", "_sparse", 8.4),
         SpeedTest("csr_matmul", (1024, 4096, 16384), ("f32", "f64"),
                   ("gpu", "cpu"), "csr_vs_dense")),
     Challenge(
@@ -180,7 +180,7 @@ CHALLENGES: tuple[Challenge, ...] = (
         "jaxlib/cpu/lapack_kernels.cc", "TriMatrixEquationSolver / EVOLVE-BLOCK",
         "The CPU backend for all of jnp.linalg; most-maintained kernel upstream. NOTE: "
         "22.7s monolith — split the hot routine into its own .cc before iterating.",
-        Build("//jaxlib/cpu:_lapack", tuple(), 22.7, _SO["_lapack"]),
+        Build("//jaxlib/cpu:_lapack.so", tuple(), 22.7, _SO["_lapack"]),
         SpeedTest("lu", (256, 512, 1024), ("f32", "f64"), ("cpu",), "lu_reconstruct")),
 
     # ===== Tier 2: XLA core graph (the computational wins; serverless rebuild) ===

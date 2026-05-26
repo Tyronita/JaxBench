@@ -100,10 +100,12 @@ def build_target(target: str, *, clang_device: bool = True,
     if log_path:
         with open(log_path, "w") as f:
             f.write(" ".join(cmd) + "\n\n" + p.stdout)
-    # the extension .so lands at bazel-bin/<pkg>/<name>.so
+    # The extension .so can land directly at bazel-bin/<pkg>/<name>.so OR under the
+    # _objs/ subdir (depends on the cc rule used). Take whichever exists.
     pkg = target.split("//", 1)[1].split(":")[0]
     name = target.split(":")[1]
-    so_src = os.path.join(JAX_REPO, "bazel-bin", pkg, f"{name}.so")
+    bbin = os.path.join(JAX_REPO, "bazel-bin", pkg)
+    so_src = os.path.join(bbin, f"{name}.so" if not name.endswith(".so") else name)
     return BuildResult(target, p.returncode, wall, _bazel_elapsed(p.stdout), so_src, p.stdout[-4000:])
 
 
